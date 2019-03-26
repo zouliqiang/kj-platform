@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.dao.PolicyNoDao">
+
+	<update id="updateEnableState" parameterType="java.lang.Integer">
+	    update policy_no set enable_state=#{enableState}
+	</update>
+    <select id="getActivePolicyNo" resultType="com.mysiteforme.admin.entity.PolicyNo">
+        select id as id,
+        policy_no as policyNo,
+        start_no as startNo,
+        no_total as noTotal,
+        allocation_number as allocationNumber,
+        no_number as noNumber,
+        new_no as newNo
+        from policy_no where enable_state=1 and del_flag=false limit 1
+    </select>
+</mapper>
