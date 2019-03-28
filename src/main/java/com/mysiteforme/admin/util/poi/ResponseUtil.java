@@ -26,8 +26,8 @@ public class ResponseUtil {
      * @date 2018/3/21 15:29
      */
     public static void setResponseExcelFile(HttpServletResponse response, String fileName) throws UnsupportedEncodingException {
-        response.setContentType("application/x-execl");
+        response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes("gbk"), "ISO-8859-1") + ".xls");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes("utf-8"), "ISO-8859-1") + ".xls");
     }
 }

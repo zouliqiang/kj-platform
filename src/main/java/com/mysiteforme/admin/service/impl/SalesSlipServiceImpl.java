@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.mysiteforme.admin.dao.SalesSlipDao;
 import com.mysiteforme.admin.entity.SalesSlip;
 import com.mysiteforme.admin.entity.VO.SalesSlipVo;
+import com.mysiteforme.admin.entity.VO.SummarySalesSlip;
 import com.mysiteforme.admin.service.SalesSlipService;
 
 /**
@@ -38,5 +39,10 @@ public class SalesSlipServiceImpl extends ServiceImpl<SalesSlipDao, SalesSlip> i
     @Override
     public Integer getTotal(Map<String, Object> paramMap) {
         return salesSlipDao.getTotal(paramMap);
+    }
+
+    @Override
+    public List<SummarySalesSlip> getSummarySalesSlip(Map<String, Object> paramMap) {
+        return salesSlipDao.getSummarySalesSlip(paramMap);
     }
 }

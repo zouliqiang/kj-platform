@@ -72,5 +72,18 @@
 			and ss.customer_name like #{customer_name}
 		</if>
 	</select>
-
+     
+    <select id="getSummarySalesSlip" parameterType="java.util.Map" resultType="com.mysiteforme.admin.entity.VO.SummarySalesSlip">
+     select
+		"网点名称" as authorizedOutlets,
+		su.login_name as name,
+		count(1) as num
+		from sales_slip ss left join sys_user su on ss.create_by=su.id
+		where
+		ss.del_flag = false and su.del_flag=false 
+		<if test="create_by!= null and create_by!='' ">
+			and ss.create_by = #{create_by}
+		</if>
+		GROUP BY ss.create_by
+    </select>
 </mapper>

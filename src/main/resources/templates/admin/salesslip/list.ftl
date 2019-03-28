@@ -57,7 +57,7 @@
             <a class="layui-btn layui-btn-warm" data-type="exportSalesSlip">结果导出</a>
         </div>
           <div class="layui-inline">
-            <a class="layui-btn layui-btn-danger" data-type="addUser">导出汇总单</a>
+            <a class="layui-btn layui-btn-danger" data-type="exportSummary">导出汇总单</a>
         </div>
  </form>
     </div>
@@ -163,6 +163,12 @@
         		   	window.location.href="${base}/admin/salesslip/export?s_custometype="+$("#custometype").val()+"&s_no="+$("#no").val()+"&s_customername="+$("#customername").val();
                 }
             };
+        var activeSummaryExport={
+        		exportSummary : function(){
+        		   	window.location.href="${base}/admin/salesslip/exportSummary";
+                }
+            };
+        
         
         //功能按钮
         var active={
@@ -220,6 +226,7 @@
             active[type] ? active[type].call(this) : '';
             activeAdd[type] ? activeAdd[type].call(this) : '';
             activeExport[type] ? activeExport[type].call(this) : '';
+            activeSummaryExport[type] ? activeSummaryExport[type].call(this) : '';
         });
 
         //搜索

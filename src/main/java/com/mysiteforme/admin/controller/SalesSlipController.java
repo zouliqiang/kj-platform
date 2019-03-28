@@ -28,6 +28,7 @@ import com.mysiteforme.admin.base.BaseController;
 import com.mysiteforme.admin.entity.SalesSlip;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.SalesSlipVo;
+import com.mysiteforme.admin.entity.VO.SummarySalesSlip;
 import com.mysiteforme.admin.util.DateUtil;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
@@ -209,6 +210,51 @@ public class SalesSlipController extends BaseController {
         }
         return true;
     }
+    
+    
+    @GetMapping("exportSummary")
+    @ResponseBody
+    public Boolean exportSummary(ServletRequest request, HttpServletResponse response) {
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        User currentUser = getCurrentUser();
+        if (!currentUser.getIsSuper()) {
+            paramMap.put("create_by", currentUser.getId());
+        }
+        List<SummarySalesSlip> list = salesSlipService.getSummarySalesSlip(paramMap);
+        List<List<CellData>> result = new ArrayList<List<CellData>>();
+        Integer index=1;
+        for (SummarySalesSlip summarySalesSlip : list) {
+            ArrayList<CellData> cellData = new ArrayList<CellData>();
+            cellData.add(new TextCellData((index++).toString()));
+            cellData.add(new TextCellData(summarySalesSlip.getAuthorizedOutlets()));
+            cellData.add(new TextCellData(summarySalesSlip.getName()));
+            cellData.add(new TextCellData(summarySalesSlip.getNum().toString()));
+            result.add(cellData);
+        }
+        ArrayList<CellData> cellData = new ArrayList<CellData>();
+        cellData.add(new TextCellData((index++).toString()));
+        cellData.add(new TextCellData("啊大苏打"));
+        cellData.add(new TextCellData("孙菲菲"));
+        cellData.add(new TextCellData("12"));
+        result.add(cellData);
+        ArrayList<CellData> cellData2 = new ArrayList<CellData>();
+        cellData2.add(new TextCellData((index++).toString()));
+        cellData2.add(new TextCellData("是非法上访"));
+        cellData2.add(new TextCellData("awew"));
+        cellData2.add(new TextCellData("12"));
+        result.add(cellData2);
+        try {
+            ResponseUtil.setResponseExcelFile(response, "保单录入汇总表");
+            ExcelFileBuilder.init().
+            addHeader(getSummaryReportHeader()).
+            addContent(result).
+            writeTo(response.getOutputStream()).
+            finish();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 
     /**
      * @Description 组装excel表头 
@@ -242,6 +288,23 @@ public class SalesSlipController extends BaseController {
         result.add(new TextCellData("第一受益人"));
         result.add(new TextCellData("录入时间"));
         result.add(new TextCellData("录入人"));
+        return result;
+    }
+    
+    /**
+     * @Description 组装excel表头 
+     * @return    
+     * @return List<CellData>     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2018年4月20日 上午10:24:10
+     */
+    private List<CellData> getSummaryReportHeader() {
+        List<CellData> result = new ArrayList<>();
+        result.add(new TextCellData("序号"));
+        result.add(new TextCellData("授权网点"));
+        result.add(new TextCellData("录入人"));
+        result.add(new TextCellData("录入总单数"));
         return result;
     }
 }
