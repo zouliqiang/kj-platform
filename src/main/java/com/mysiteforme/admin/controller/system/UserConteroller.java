@@ -104,7 +104,7 @@ public class UserConteroller extends BaseController{
 
     @GetMapping("edit")
     public String edit(Long id,Model model){
-        User user = userService.findUserById(id);
+        User user = userService.selectById(id);
         List<Long> roleIdList = Lists.newArrayList();
         if(user != null) {
             Set<Role> roleSet = user.getRoleLists();

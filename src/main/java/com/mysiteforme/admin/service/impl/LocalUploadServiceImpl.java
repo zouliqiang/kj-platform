@@ -39,8 +39,7 @@ public class LocalUploadServiceImpl implements UploadService {
                 file.getOriginalFilename().lastIndexOf("."));
         String fileName = UUID.randomUUID() + extName;
         String contentType = file.getContentType();
-        StringBuffer sb = new StringBuffer(ResourceUtils.getURL("classpath:").getPath());
-        String filePath = sb.append("static/upload/").toString();
+        String filePath = "/var/images/head/";
         File targetFile = new File(filePath);
         if(!targetFile.exists()){
             targetFile.mkdirs();
@@ -49,7 +48,7 @@ public class LocalUploadServiceImpl implements UploadService {
         out.write(data);
         out.flush();
         out.close();
-        String webUrl = "/static/upload/"+fileName;
+        String webUrl = fileName;
         rescource = new Rescource();
         rescource.setFileName(fileName);
         rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.getSize()/1024)+"kb");

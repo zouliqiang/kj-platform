@@ -91,7 +91,7 @@
 					<span>保障范围：</span>凡在中华人民共和国境内安装了河北酷嘉汽车服务有限公司销售的酷嘉车载智能终端产品的车辆，该车辆必须手续齐全，合法有效。
 				</div>
 				<div class="detail detail2">
-					<span>保险期限:</span> <span class="year">33</span>年，自设备安装之日起生效，在保险期间内如发生车辆转让，保险责任终止；车辆所有人或管理人应及时通知河北酷嘉汽车服务有限公司办理变更手续，手续变更次日零时保险责任恢复，否则保险人不承担赔偿责任。
+					<span>保险期限:</span> <span class="year">${salesSlip.insuranceTerm}</span>年，自设备安装之日起生效，在保险期间内如发生车辆转让，保险责任终止；车辆所有人或管理人应及时通知河北酷嘉汽车服务有限公司办理变更手续，手续变更次日零时保险责任恢复，否则保险人不承担赔偿责任。
 				</div>
 				<div class="detail detail3">
 					<span>保险责任：</span>保险合同（保单号：<span class="guarantee-slip">${salesSlip.policyNo}</span>）项下约定的责任，即保障范围内车辆被全车盗窃、抢劫、抢夺，经县级以上公安刑侦部门立案证实，满三个月未查明下落的，保险人根据保险合同约定进行赔偿。
@@ -100,7 +100,7 @@
 					<span>赔偿处理：</span><br>
 					1.出险车辆未购买盗抢险的，按被盗车辆折旧后价格的100%进行赔偿；出险车辆已购买盗抢险的，在机动车辆保险先行赔付的前提下，本保险对机动车盗抢险20%免赔部分在赔偿限额内进行差额赔付。折旧率计算方法参照中国人寿财产保险股份有限公司机动车辆保险对应的车辆种类或型号和折旧率。<br>
 					2.我公司确认索赔单证齐全有效后20个工作日内支付赔款。获取赔款后，运营商及车主应协助我公司向责任者进行追偿。本保险赔偿限额最高为RMB
-					<span class="money"><#setting number_format="0.00">${(salesSlip.compensatePrice/10000)?string("0.##")}</span> 万元。<br>
+					<span class="money"><#setting number_format="0.00">${(salesSlip.compensatePrice/10000)?string("0.####")}</span> 万元。<br>
 					3、特别声明：若投保车辆为银行、金融公司贷款所购，发生保险事故，未还清银行、金融公司贷款时，保险赔款将直接支付给所属银行或金融公司。第一受益人：<span
 						class="people">${salesSlip.firstBeneficiary}</span>
 				</div>

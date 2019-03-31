@@ -25,6 +25,6 @@ public interface PolicyNoUserService extends IService<PolicyNoUser> {
 
     Integer getUserTotal(Map<String, Object> paramMap);
 
-
+    PolicyNoUser getPolicyNoUser(Map<String, Object> map);
 
 }

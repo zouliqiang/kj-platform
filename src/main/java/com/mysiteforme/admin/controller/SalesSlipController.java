@@ -1,16 +1,20 @@
 package com.mysiteforme.admin.controller;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,35 +25,62 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.mysiteforme.admin.annotation.SysLog;
 import com.mysiteforme.admin.base.BaseController;
+import com.mysiteforme.admin.entity.PolicyNo;
+import com.mysiteforme.admin.entity.PolicyNoUser;
 import com.mysiteforme.admin.entity.SalesSlip;
+import com.mysiteforme.admin.entity.SalesSlipExport;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.SalesSlipVo;
 import com.mysiteforme.admin.entity.VO.SummarySalesSlip;
 import com.mysiteforme.admin.util.DateUtil;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
-import com.mysiteforme.admin.util.poi.ExcelFileBuilder;
-import com.mysiteforme.admin.util.poi.ResponseUtil;
-import com.mysiteforme.admin.util.poi.data.CellData;
-import com.mysiteforme.admin.util.poi.data.TextCellData;
+import com.mysiteforme.admin.util.poi.ExportExcelUtil;
+import com.mysiteforme.admin.util.poi.ExportExcelWrapper;
 
+/**
+ * @Description 保单控制
+ * @date  2019年3月31日下午10:08:53
+ * @version V1.0  
+ * @author 邹立强   (zoulq@cloud-young.com)
+ * <p>Copyright (c) Department of Research and Development/Beijing.</p>
+ */
 @Controller
 @RequestMapping("/admin/salesslip")
-public class SalesSlipController extends BaseController {
-
+public class SalesSlipController extends BaseController{
+    
+    @Autowired
+    private  RedisTemplate<String, String> redisTemplate;
+    
+    /**
+     * @Description 进入保单列表页 
+     * @return String     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:09:07
+     */
     @GetMapping("list")
     public String list() {
         return "/admin/salesslip/list";
     }
-
+    
+    /**
+     * @Description 查询保单列表 
+     * @param page
+     * @param limit
+     * @param request
+     * @return    
+     * @return LayerData<SalesSlipVo>     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:09:24
+     */
     @PostMapping("list")
     @ResponseBody
     public LayerData<SalesSlipVo> list(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request) {
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<SalesSlipVo> layerData = new LayerData<>();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("pageStart", (page - 1) * limit);
@@ -78,54 +109,178 @@ public class SalesSlipController extends BaseController {
         layerData.setCount(total);
         return layerData;
     }
-
+    
+    /**
+     * @Description 进入录入保单页面 
+     * @return    
+     * @return String     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:09:38
+     */
     @GetMapping("add")
     public String add() {
         return "/admin/salesslip/add";
     }
-
-    // @RequiresPermissions("salesslip:add")
+    
+    /**
+     * @Description 录入保单 
+     * @param salesSlip
+     * @return    
+     * @return RestResponse     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:09:56
+     */
+    @RequiresPermissions("salesslip:add")
     @PostMapping("add")
-    @SysLog("保存保单数据")
+    @SysLog("录入保单数据")
     @ResponseBody
     public RestResponse add(@RequestBody SalesSlip salesSlip) {
-        Date date = new Date();
         User currentUser = getCurrentUser();
-        salesSlip.setPolicyNo("12345678");
-        salesSlip.setNo("2");
-        salesSlip.setCreateBy(currentUser.getId());
+        if(currentUser.getIsSuper()) {
+            return RestResponse.failure("超级管理员没有添加保单权限");
+        }
+        lock("salesSlip");
+        try {
+        PolicyNo policyNo = policyNoService.getActivePolicyNo();
+        if(policyNo==null) {
+            return RestResponse.failure("保单未激活，请联系管理员");
+        }
+        policyNo.setNoNumber(policyNo.getNoNumber()+1);
+        policyNo.setNewNo(policyNo.getNewNo()+1);
+        policyNo.setUpdateDate(new Date());
+        policyNo.setUpdateId(currentUser.getCreateId());
+        Date date = new Date();
+        salesSlip.setPolicyNo(policyNo.getPolicyNo());
+        salesSlip.setNo(policyNo.getNewNoStr());
+        salesSlip.setCreateId(currentUser.getId());
         salesSlip.setCreateDate(date);
         salesSlip.setDelFlag(0);
+        salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
+        Map<String,Object> map=new HashMap<String,Object>();
+        map.put("userId", currentUser.getId());
+        map.put("policyNo", policyNo.getPolicyNo());
+        if ("1".equals(salesSlip.getCustomerType())) {
+            salesSlip.setCertificateType(1);
+        } else {
+            salesSlip.setCertificateType(2);
+        }
+        PolicyNoUser policyNoUser = policyNoUserService.getPolicyNoUser(map);
+        if(policyNoUser==null) {
+            return RestResponse.failure("您暂且无录入保单权限！请联系管理员");
+        }
+        Integer allocationNumber = policyNoUser.getAllocationNumber();
+        Integer useNumber = policyNoUser.getUseNumber();
+        if(useNumber>=allocationNumber) {
+            return RestResponse.failure("录入保单数量超限，不可再次录入");
+        }
+        policyNoUser.setUseNumber(policyNoUser.getUseNumber()+1);
+        salesSlipService.saveSalesSlip(salesSlip);
+        policyNoService.updateById(policyNo);
+        policyNoUserService.updateById(policyNoUser);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            unLock("salesSlip"); 
+        }
+        return RestResponse.success();
+    }
+    
+    /**
+     * @Description 查看保单内容 
+     * @param id
+     * @param model
+     * @return    
+     * @return String     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:10:12
+     */
+    @GetMapping("look")
+    public String look(Long id, Model model) {
+        User currentUser = getCurrentUser();
+        if (id == null) {
+            model.addAttribute("message", "暂无权限");
+            return "/admin/error/404";
+        }
+        SalesSlip salesSlip = salesSlipService.selectById(id);
+        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != salesSlip.getCreateId().intValue()) {
+            model.addAttribute("message", "暂无权限");
+            return "/admin/error/404";
+        }
+        if (salesSlip == null) {
+            model.addAttribute("message", "暂无保单信息");
+            return "/admin/error/404";
+        }
+        model.addAttribute("salesSlip", salesSlip);
+        return "/admin/salesslip/look";
+    }
+    
+    /**
+     * @Description 进入编辑保单页面 
+     * @param id
+     * @param model
+     * @return    
+     * @return String     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:10:23
+     */
+    @GetMapping("edit")
+    public String edit(Long id, Model model) {
+        User currentUser = getCurrentUser();
+        if (id == null) {
+            model.addAttribute("message", "暂无权限");
+            return "/admin/error/404";
+        }
+        SalesSlip salesSlip = salesSlipService.selectById(id);
+        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != salesSlip.getCreateId().intValue()) {
+            model.addAttribute("message", "暂无权限");
+            return "/admin/error/404";
+        }
+        if (salesSlip == null) {
+            model.addAttribute("message", "暂无保单信息");
+            return "/admin/error/404";
+        }
+        model.addAttribute("salesSlip", salesSlip);
+        return "/admin/salesslip/edit";
+    }
+    
+    @RequiresPermissions("salesslip:edit")
+    @PostMapping("edit")
+    @SysLog("编辑保单数据")
+    @ResponseBody
+    public RestResponse edit(@RequestBody SalesSlip salesSlip) {
+        User currentUser = getCurrentUser();
+        try {
+        Date date = new Date();
+        salesSlip.setUpdateId(currentUser.getId());
+        salesSlip.setUpdateDate(date);
         salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
         if ("1".equals(salesSlip.getCustomerType())) {
             salesSlip.setCertificateType(1);
         } else {
             salesSlip.setCertificateType(2);
         }
-        salesSlipService.saveSalesSlip(salesSlip);
+        salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
+        salesSlipService.updateById(salesSlip);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         return RestResponse.success();
     }
-
-    @GetMapping("look")
-    public String edit(Long id, Model model) {
-        User currentUser = getCurrentUser();
-        if (id == null) {
-            model.addAttribute("message", "暂无权限");
-            return "/admin/error/500";
-        }
-        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != id.intValue()) {
-            model.addAttribute("message", "暂无权限");
-            return "/admin/error/500";
-        }
-        SalesSlip salesSlip = salesSlipService.selectById(id);
-        if (salesSlip == null) {
-            model.addAttribute("message", "暂无保单信息");
-            return "/admin/error/500";
-        }
-        model.addAttribute("salesSlip", salesSlip);
-        return "/admin/salesslip/look";
-    }
-
+    
+    /**
+     * @Description 进入保单打印页面 
+     * @param id
+     * @param model
+     * @return    
+     * @return String     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:10:37
+     */
     @GetMapping("print")
     public String print(Long id, Model model) {
         User currentUser = getCurrentUser();
@@ -133,25 +288,34 @@ public class SalesSlipController extends BaseController {
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
-        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != id.intValue()) {
-            model.addAttribute("message", "暂无权限");
-            return "/admin/error/404";
-        }
         SalesSlip salesSlip = salesSlipService.selectById(id);
         if (salesSlip == null) {
             model.addAttribute("message", "暂无保单信息");
             return "/admin/error/404";
         }
+        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != salesSlip.getCreateId().intValue()) {
+            model.addAttribute("message", "暂无权限");
+            return "/admin/error/404";
+        }
         model.addAttribute("salesSlip", salesSlip);
         return "/admin/salesslip/print";
     }
-
+    
+    /**
+     * @Description 导出保单 
+     * @param request
+     * @param response
+     * @return    
+     * @return Boolean     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:10:55
+     */
     @GetMapping("export")
     @ResponseBody
     public Boolean export(ServletRequest request, HttpServletResponse response) {
-        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        Wrapper<SalesSlip> wrapper = new EntityWrapper<>();
         if (!map.isEmpty()) {
             String customeType = (String) map.get("custometype");
             if (StringUtils.isNotBlank(customeType)) {
@@ -171,47 +335,63 @@ public class SalesSlipController extends BaseController {
             paramMap.put("create_by", currentUser.getId());
         }
         List<SalesSlipVo> list = salesSlipService.getListSalesSlip(paramMap);
-        List<List<CellData>> result = new ArrayList<List<CellData>>();
+        List<SalesSlipExport> result=new ArrayList<SalesSlipExport>();
+        Integer index=1;
         for (SalesSlipVo salesSlip : list) {
-            ArrayList<CellData> cellData = new ArrayList<CellData>();
-            cellData.add(new TextCellData(salesSlip.getPolicyNo()));
-            cellData.add(new TextCellData(salesSlip.getNo()));
+            SalesSlipExport salesSlipExport=new SalesSlipExport();
+            salesSlipExport.setIndex(index++);
+            salesSlipExport.setPolicyNo(salesSlip.getPolicyNo());
+            salesSlipExport.setNo(salesSlip.getNo());
+            salesSlipExport.setCustomerName(salesSlip.getCustomerName());
             if (1 == salesSlip.getCustomerType()) {
-                cellData.add(new TextCellData("个人客户"));
+                salesSlipExport.setCustomerType("个人客户");
             } else {
-                cellData.add(new TextCellData("企业客户"));
+                salesSlipExport.setCustomerType("企业客户");
             }
-            cellData.add(new TextCellData(salesSlip.getCertificateNo()));
-            cellData.add(new TextCellData(salesSlip.getCustomerMobile()));
-            cellData.add(new TextCellData(salesSlip.getCustomerAddress()));
-            cellData.add(new TextCellData(salesSlip.getVehicleBrand()));
-            cellData.add(new TextCellData(salesSlip.getLicencePlateNo()));
-            cellData.add(new TextCellData(salesSlip.getVehicleFrameNo()));
-            cellData.add(new TextCellData(salesSlip.getEngineFrameNo()));
-            cellData.add(new TextCellData(salesSlip.getInstallAddress()));
-            cellData.add(new TextCellData(salesSlip.getVehiclePrice().toString()));
-            cellData.add(new TextCellData(DateUtil.formatDateTime(salesSlip.getInstallDate(), DateUtil.LONG_DATE_FORMAT)));
-            cellData.add(new TextCellData(salesSlip.getInstallser()));
-            cellData.add(new TextCellData(salesSlip.getProductNo()));
-            cellData.add(new TextCellData(salesSlip.getInsuranceTerm().toString()));
-            cellData.add(new TextCellData(DateUtil.formatDateTime(salesSlip.getInsuranceStartDate(), DateUtil.LONG_DATE_FORMAT)));
-            cellData.add(new TextCellData(DateUtil.formatDateTime(salesSlip.getInsuranceEndDate(), DateUtil.LONG_DATE_FORMAT)));
-            cellData.add(new TextCellData(salesSlip.getCompensatePrice().toString()));
-            cellData.add(new TextCellData(salesSlip.getFirstBeneficiary()));
-            cellData.add(new TextCellData(DateUtil.formatDateTime(salesSlip.getCreateDate(), DateUtil.FORMAT_ONE)));
-            cellData.add(new TextCellData(salesSlip.getName()));
-            result.add(cellData);
+            salesSlipExport.setCertificateNo(salesSlip.getCertificateNo());
+            salesSlipExport.setCustomerMobile(salesSlip.getCustomerMobile());
+            salesSlipExport.setCustomerAddress(salesSlip.getCustomerAddress());
+            salesSlipExport.setVehicleBrand(salesSlip.getVehicleBrand());
+            salesSlipExport.setLicencePlateNo(salesSlip.getLicencePlateNo());
+            salesSlipExport.setVehicleFrameNo(salesSlip.getVehicleFrameNo());
+            salesSlipExport.setEngineFrameNo(salesSlip.getEngineFrameNo());
+            salesSlipExport.setRegistrationDate(DateUtil.formatDateTime(salesSlip.getRegistrationDate(), DateUtil.LONG_DATE_FORMAT));
+            salesSlipExport.setVehiclePrice(salesSlip.getVehiclePrice());
+            salesSlipExport.setInstallDate(DateUtil.formatDateTime(salesSlip.getInstallDate(), DateUtil.LONG_DATE_FORMAT));
+            salesSlipExport.setInstallAddress(salesSlip.getInstallAddress());
+            salesSlipExport.setInstallser(salesSlip.getInstallser());
+            salesSlipExport.setProductNo(salesSlip.getProductNo());
+            salesSlipExport.setInsuranceTerm(salesSlip.getInsuranceTerm());
+            salesSlipExport.setInsuranceStartDate(DateUtil.formatDateTime(salesSlip.getInsuranceStartDate(), DateUtil.LONG_DATE_FORMAT));
+            salesSlipExport.setInsuranceEndDate(DateUtil.formatDateTime(salesSlip.getInsuranceEndDate(), DateUtil.LONG_DATE_FORMAT));
+            salesSlipExport.setCompensatePrice(salesSlip.getCompensatePrice());
+            salesSlipExport.setFirstBeneficiary(salesSlip.getFirstBeneficiary());
+            salesSlipExport.setEntryTime(DateUtil.formatDateTime(salesSlip.getCreateDate(), DateUtil.FORMAT_ONE));
+            salesSlipExport.setEntryName(salesSlip.getName());
+            result.add(salesSlipExport);
         }
         try {
-            ResponseUtil.setResponseExcelFile(response, "保单");
-            ExcelFileBuilder.init().addHeader(getReportHeader()).addContent(result).writeTo(response.getOutputStream()).finish();
-        } catch (IOException e) {
+            String[] columnNames = { "序号", "保单号", " NO","客户名字", "客户类型","证件号","客户联系电话","通讯地址","车品牌","车牌号","车架号","发动机号","登记日期",
+                    "初始车价格","安装日期","安装地点","安装人","产品SN码","保险期限","保险开始时间","保险结束时间","赔偿限额","第一受益人","录入时间","录入人"};
+            String fileName = "保单表";
+            ExportExcelWrapper<SalesSlipExport> util = new ExportExcelWrapper<SalesSlipExport>();
+            util.exportExcel(fileName, fileName, columnNames, result, response, ExportExcelUtil.EXCEl_FILE_2007);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return true;
     }
     
-    
+    /**
+     * @Description 导出汇总单 
+     * @param request
+     * @param response
+     * @return    
+     * @return Boolean     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:11:05
+     */
     @GetMapping("exportSummary")
     @ResponseBody
     public Boolean exportSummary(ServletRequest request, HttpServletResponse response) {
@@ -221,90 +401,64 @@ public class SalesSlipController extends BaseController {
             paramMap.put("create_by", currentUser.getId());
         }
         List<SummarySalesSlip> list = salesSlipService.getSummarySalesSlip(paramMap);
-        List<List<CellData>> result = new ArrayList<List<CellData>>();
-        Integer index=1;
+        Integer index=0;
         for (SummarySalesSlip summarySalesSlip : list) {
-            ArrayList<CellData> cellData = new ArrayList<CellData>();
-            cellData.add(new TextCellData((index++).toString()));
-            cellData.add(new TextCellData(summarySalesSlip.getAuthorizedOutlets()));
-            cellData.add(new TextCellData(summarySalesSlip.getName()));
-            cellData.add(new TextCellData(summarySalesSlip.getNum().toString()));
-            result.add(cellData);
+            index++;
+            summarySalesSlip.setIndex(index);
         }
-        ArrayList<CellData> cellData = new ArrayList<CellData>();
-        cellData.add(new TextCellData((index++).toString()));
-        cellData.add(new TextCellData("啊大苏打"));
-        cellData.add(new TextCellData("孙菲菲"));
-        cellData.add(new TextCellData("12"));
-        result.add(cellData);
-        ArrayList<CellData> cellData2 = new ArrayList<CellData>();
-        cellData2.add(new TextCellData((index++).toString()));
-        cellData2.add(new TextCellData("是非法上访"));
-        cellData2.add(new TextCellData("awew"));
-        cellData2.add(new TextCellData("12"));
-        result.add(cellData2);
         try {
-            ResponseUtil.setResponseExcelFile(response, "保单录入汇总表");
-            ExcelFileBuilder.init().
-            addHeader(getSummaryReportHeader()).
-            addContent(result).
-            writeTo(response.getOutputStream()).
-            finish();
-        } catch (IOException e) {
+            String[] columnNames = { "序号", "授权网点", " 录入人", "录入总单数"};
+            String fileName = "保单录入汇总表";
+            ExportExcelWrapper<SummarySalesSlip> util = new ExportExcelWrapper<SummarySalesSlip>();
+            util.exportExcel(fileName, fileName, columnNames, list, response, ExportExcelUtil.EXCEl_FILE_2007);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return true;
     }
 
+    
     /**
-     * @Description 组装excel表头 
-     * @return    
-     * @return List<CellData>     
+     * @Description redis分布式锁 
+     * @param lockKey
+     * @return boolean     
      * @version V1.0
      * @auth    邹立强   (zoulq@cloud-young.com)
-     * 2018年4月20日 上午10:24:10
+     * 2019年3月31日 上午11:23:09
      */
-    private List<CellData> getReportHeader() {
-        List<CellData> result = new ArrayList<>();
-        result.add(new TextCellData("保单号"));
-        result.add(new TextCellData("NO"));
-        result.add(new TextCellData("客户类型"));
-        result.add(new TextCellData("证件号"));
-        result.add(new TextCellData("客户联系电话"));
-        result.add(new TextCellData("通讯地址"));
-        result.add(new TextCellData("车品牌"));
-        result.add(new TextCellData("车牌号"));
-        result.add(new TextCellData("车架号"));
-        result.add(new TextCellData("发动机号"));
-        result.add(new TextCellData("初始车价格"));
-        result.add(new TextCellData("安装日期"));
-        result.add(new TextCellData("安装地点"));
-        result.add(new TextCellData("安装人"));
-        result.add(new TextCellData("产品SN码"));
-        result.add(new TextCellData("保险期限"));
-        result.add(new TextCellData("保险开始时间"));
-        result.add(new TextCellData("保险结束时间"));
-        result.add(new TextCellData("赔偿限额"));
-        result.add(new TextCellData("第一受益人"));
-        result.add(new TextCellData("录入时间"));
-        result.add(new TextCellData("录入人"));
-        return result;
+    public synchronized boolean lock(String lockKey){
+        boolean locked = false;
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(lockKey,"addSalesSliping");
+        if(success != null && success){
+            redisTemplate.expire(lockKey,10,TimeUnit.SECONDS);
+            locked = true;
+        }else{
+            while (true) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Boolean success2 = redisTemplate.opsForValue().setIfAbsent(lockKey,"addSalesSliping");
+                if(success2 != null && success2){
+                    redisTemplate.expire(lockKey,10,TimeUnit.SECONDS);
+                    locked = true;
+                    break;
+                }
+            }
+        }
+        return locked;
     }
     
     /**
-     * @Description 组装excel表头 
-     * @return    
-     * @return List<CellData>     
+     * @Description redis解锁 
+     * @param lockKey    
+     * @return void     
      * @version V1.0
      * @auth    邹立强   (zoulq@cloud-young.com)
-     * 2018年4月20日 上午10:24:10
+     * 2019年3月31日 上午11:24:26
      */
-    private List<CellData> getSummaryReportHeader() {
-        List<CellData> result = new ArrayList<>();
-        result.add(new TextCellData("序号"));
-        result.add(new TextCellData("授权网点"));
-        result.add(new TextCellData("录入人"));
-        result.add(new TextCellData("录入总单数"));
-        return result;
+    public  void unLock(String lockKey){
+       redisTemplate.delete(lockKey);
     }
 }

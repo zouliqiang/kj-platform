@@ -53,8 +53,8 @@
 		su.nick_name as nickName,
 		su.login_name as loginName,
 		su.create_date as createDate
-		from sys_user su left join policy_no_user pnu on pnu.user_id=su.id
-		where pnu.id is null and pnu.policy_no=#{policyNo}
+		from sys_user su LEFT JOIN ( SELECT * FROM policy_no_user where  policy_no = #{policyNo} ) pnu ON pnu.user_id = su.id 
+		where pnu.id is null  and 
 		 su.del_flag=false
 		and is_super!=1 and locked!=1
 		<if test="login_name!=null and login_name!='' ">
@@ -83,6 +83,12 @@
 		<if test="limit!= null and limit!='' ">
 			limit #{pageStart},#{limit}
 		</if>
+	</select>
+	<select id="getPolicyNoUser" parameterType="java.util.HashMap" resultType="com.mysiteforme.admin.entity.PolicyNoUser">
+	      select id,policy_no as policy_no,user_id as userId,allocation_number as allocationNumber,
+	      use_number as useNumber,create_date as createDate,update_date as updateDate,
+	      update_by as updateBy,del_flag as delFlag from policy_no_user
+	      where policy_no=#{policyNo} and user_id=#{userId} limit 1
 	</select>
 
 </mapper>

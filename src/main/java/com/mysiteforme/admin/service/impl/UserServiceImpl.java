@@ -58,7 +58,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 			@CachePut(value = "user", key = "'user_id_'+T(String).valueOf(#result.id)",condition = "#result.id != null and #result.id != 0"),
 			@CachePut(value = "user", key = "'user_name_'+#user.loginName", condition = "#user.loginName !=null and #user.loginName != ''"),
 			@CachePut(value = "user", key = "'user_email_'+#user.email", condition = "#user.email != null and #user.email != ''"),
-			@CachePut(value = "user", key = "'user_tel_'+#user.tel", condition = "#user.tel != null and #user.tel != ''")
+			@CachePut(value = "user", key = "'user_tel_'+#user.tel", condition = "#user.tel != null and #user.tel != ''"),
+	                @CachePut(value = "user", key = "'user_website_'+#user.website", condition = "#user.website != null and #user.website != ''")
+
 	})
 	@Transactional(readOnly = false, rollbackFor = Exception.class)
 	public User saveUser(User user) {

@@ -16,6 +16,8 @@ public interface PolicyNoService extends IService<PolicyNo> {
 
     PolicyNo getActivePolicyNo();
 
+    PolicyNo getPolicyNoByPolicyNo(String policyNo);
+
 
 
 }

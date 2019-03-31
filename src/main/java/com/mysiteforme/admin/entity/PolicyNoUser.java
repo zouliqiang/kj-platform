@@ -57,7 +57,7 @@ public class PolicyNoUser implements java.io.Serializable {
      * 创建用户Id
      */
     @TableField("create_by")
-    private Long createBy;
+    private Long createId;
 
     /**
      * 更新时间
@@ -69,7 +69,7 @@ public class PolicyNoUser implements java.io.Serializable {
      * 更新用户Id
      */
     @TableField("update_by")
-    private Long updateBy;
+    private Long updateId;  
 
     /**
      * 0未删除1已删除
@@ -125,14 +125,6 @@ public class PolicyNoUser implements java.io.Serializable {
         this.createDate = createDate;
     }
 
-    public Long getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(Long createBy) {
-        this.createBy = createBy;
-    }
-
     public Date getUpdateDate() {
         return updateDate;
     }
@@ -141,13 +133,6 @@ public class PolicyNoUser implements java.io.Serializable {
         this.updateDate = updateDate;
     }
 
-    public Long getUpdateBy() {
-        return updateBy;
-    }
-
-    public void setUpdateBy(Long updateBy) {
-        this.updateBy = updateBy;
-    }
 
     public Integer getDelFlag() {
         return delFlag;
@@ -155,5 +140,21 @@ public class PolicyNoUser implements java.io.Serializable {
 
     public void setDelFlag(Integer delFlag) {
         this.delFlag = delFlag;
+    }
+
+    public Long getCreateId() {
+        return createId;
+    }
+
+    public void setCreateId(Long createId) {
+        this.createId = createId;
+    }
+
+    public Long getUpdateId() {
+        return updateId;
+    }
+
+    public void setUpdateId(Long updateId) {
+        this.updateId = updateId;
     }
 }

@@ -11,4 +11,6 @@ public interface PolicyNoDao extends BaseMapper<PolicyNo> {
     Integer updateEnableState(@Param("enableState")int enableState);
 
     PolicyNo getActivePolicyNo();
+
+    PolicyNo getPolicyNoByPolicyNo(@Param("policyNo")String policyNo);
 }

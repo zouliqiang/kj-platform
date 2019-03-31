@@ -2,7 +2,7 @@
 <html class="loginHtml">
 <head>
     <meta charset="utf-8">
-    <title>MySiteForMe系统后台--孤独的旅行家</title>
+    <title>酷嘉服务平台</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -16,13 +16,13 @@
 <body>
 <div id="bg-body"></div>
 <div class="login">
-    <h1>孤独的旅行家</h1>
+    <h1>酷嘉服务平台</h1>
     <form class="layui-form" action="${base}/login/main" method="post">
         <div class="layui-form-item">
-            <input class="layui-input" name="username" value="test" placeholder="请输入用户名" lay-verify="required" type="text" autocomplete="off">
+            <input class="layui-input" name="username"  placeholder="请输入用户名" lay-verify="required" type="text" autocomplete="off">
         </div>
         <div class="layui-form-item">
-            <input class="layui-input" name="password" value="1" placeholder="请输入密码" lay-verify="required" type="password" autocomplete="off">
+            <input class="layui-input" name="password"  placeholder="请输入密码" lay-verify="required" type="password" autocomplete="off">
         </div>
         <div class="layui-form-item form_code">
             <input class="layui-input" name="code" placeholder="验证码" lay-verify="required" type="text" autocomplete="off">
@@ -33,13 +33,6 @@
         </div>
         <div class="layui-form-item">
             <button class="layui-btn login_btn" lay-submit="" lay-filter="login">登录</button>
-        </div>
-        <div class="layui-form-item">
-            <fieldset class="layui-elem-field">
-                <div class="layui-field-box" style="color: #fff;font-size: 20px;">
-                    用户名:test &nbsp;&nbsp;&nbsp;密码:1
-                </div>
-            </fieldset>
         </div>
     </form>
 </div>

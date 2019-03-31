@@ -40,7 +40,7 @@
        <div class="layui-form-item">
         <label class="layui-form-label">No.起始值</label>
         <div class="layui-input-block">
-            <input  type="text"  class="layui-input" name="startNo"  maxlength="100" lay-verify="required|number">
+            <input  type="text"  class="layui-input" name="startNo"  maxlength="7" lay-verify="required|number">
         </div>
     </div>
      <div class="layui-form-item">
@@ -53,7 +53,7 @@
           <div class="layui-form-item">
         <label class="layui-form-label">是否启用</label>
         <div class="layui-input-block">
-                <input type="checkbox" name="enableState" lay-skin="switch" lay-text="是|否" value="0">
+                <input type="checkbox" name="enableState" lay-skin="switch" lay-text="是|否">
         </div>
     </div>
      <div class="layui-form-item">

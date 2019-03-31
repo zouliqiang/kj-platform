@@ -1,12 +1,8 @@
 package com.mysiteforme.admin.base;
 
-import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.realm.AuthRealm.ShiroUser;
-import com.mysiteforme.admin.service.SiteService;
-import com.mysiteforme.admin.service.UserService;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.util.Factory;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +11,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.service.SiteService;
+import com.mysiteforme.admin.service.UserService;
+import com.mysiteforme.admin.util.Constants;
 
 /**
  * Created by wangl on 2017/11/30.
@@ -44,6 +42,7 @@ public class MyHandlerInterceptor implements HandlerInterceptor {
         httpServletRequest.setAttribute("site",siteService.getCurrentSite());
         User user = userService.findUserById(MySysUser.id());
         if(user != null){
+            user.setIcon(Constants.WEB_IP+user.getIcon());
             httpServletRequest.setAttribute("currentUser",user);
             return true;
         }

@@ -5,6 +5,7 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.mysiteforme.admin.util.ToolUtil;
 
 /**
  * @Description 保单号实体
@@ -40,19 +41,19 @@ public class PolicyNo implements java.io.Serializable {
      * NO.总数量
      */
     @TableField("no_total")
-    private Integer noTotal;
+    private Integer noTotal=0;
 
     /**
      * NO.已分配数量
      */
     @TableField("allocation_number")
-    private Integer allocationNumber;
+    private Integer allocationNumber=0;
     
     /**
      * NO.当前保单数量
      */
     @TableField("no_number")
-    private Integer noNumber; 
+    private Integer noNumber=0; 
     
     /**
      * 最新NO.
@@ -76,7 +77,7 @@ public class PolicyNo implements java.io.Serializable {
      * 创建用户Id
      */
     @TableField("create_by")
-    private Long createBy;
+    private Long createId;
 
     /**
      * 更新时间
@@ -95,11 +96,17 @@ public class PolicyNo implements java.io.Serializable {
      */
     @TableField("del_flag")
     private Integer delFlag;
+    
+    @TableField(exist = false)
+    private String startNoStr;
 
+    @TableField(exist = false)
+    private String newNoStr;
+    
     public Long getId() {
         return id;
-    }
 
+    }
     public void setId(Long id) {
         this.id = id;
     }
@@ -145,13 +152,6 @@ public class PolicyNo implements java.io.Serializable {
         this.createDate = createDate;
     }
 
-    public Long getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(Long createBy) {
-        this.createBy = createBy;
-    }
 
     public Date getUpdateDate() {
         return updateDate;
@@ -162,13 +162,6 @@ public class PolicyNo implements java.io.Serializable {
         this.updateDate = updateDate;
     }
 
-    public Long getUpdateId() {
-        return updateId;
-    }
-
-    public void setUpdateId(Long updateId) {
-        this.updateId = updateId;
-    }
 
     public Integer getDelFlag() {
         return delFlag;
@@ -200,5 +193,33 @@ public class PolicyNo implements java.io.Serializable {
 
     public void setStartNo(Integer startNo) {
         this.startNo = startNo;
+    }
+
+    public String getStartNoStr() {
+        return ToolUtil.getPolicyNo(this.startNo);
+    }
+
+    public void setStartNoStr(String startNoStr) {
+        this.startNoStr = startNoStr;
+    }
+
+    public String getNewNoStr() {
+        return ToolUtil.getPolicyNo(this.newNo);
+    }
+
+    public void setNewNoStr(String newNoStr) {
+        this.newNoStr = newNoStr;
+    }
+    public Long getCreateId() {
+        return createId;
+    }
+    public void setCreateId(Long createId) {
+        this.createId = createId;
+    }
+    public Long getUpdateId() {
+        return updateId;
+    }
+    public void setUpdateId(Long updateId) {
+        this.updateId = updateId;
     }
 }

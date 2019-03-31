@@ -15,4 +15,14 @@
         new_no as newNo
         from policy_no where enable_state=1 and del_flag=false limit 1
     </select>
+    <select id="getPolicyNoByPolicyNo" parameterType="java.lang.String" resultType="com.mysiteforme.admin.entity.PolicyNo">
+      select id as id,
+        policy_no as policyNo,
+        start_no as startNo,
+        no_total as noTotal,
+        allocation_number as allocationNumber,
+        no_number as noNumber,
+        new_no as newNo
+        from policy_no where policy_no=#{policyNo} limit 1
+    </select>
 </mapper>

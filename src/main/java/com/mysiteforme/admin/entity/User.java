@@ -69,7 +69,13 @@ public class User extends DataEntity<User> {
      * 是否是超级管理员
      */
     @TableField(value = "is_super", strategy = FieldStrategy.IGNORED)
-    private Boolean isSuper;
+    private Boolean isSuper=false;
+    
+    /**
+     * 站点
+     */
+    @TableField(value = "website", strategy = FieldStrategy.IGNORED)
+    private String website;
 
     @TableField(strategy = FieldStrategy.IGNORED)
     private String icon;
@@ -170,4 +176,12 @@ public class User extends DataEntity<User> {
         this.isSuper = isSuper;
     }
 
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+    
 }

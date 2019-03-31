@@ -78,7 +78,12 @@
             </div>
         </div>
     </div>
-
+    <div class="layui-form-item">
+        <label class="layui-form-label">站点</label>
+        <div class="layui-input-block">
+            <input type="text" class="layui-input" name="website" lay-verify="required" placeholder="请输入站点">
+        </div>
+    </div>
     <div class="layui-form-item">
         <label class="layui-form-label">是否启用</label>
         <div class="layui-input-block">

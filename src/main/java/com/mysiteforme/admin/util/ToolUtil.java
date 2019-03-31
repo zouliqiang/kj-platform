@@ -272,6 +272,14 @@ public class ToolUtil {
 		finalMap.put("isp",isp);
 		return finalMap;
 	}
+	
+	public static String getPolicyNo(Integer no) {
+	    String noStr="";
+	    if (no!=null) {
+	        noStr=String.format("%07d", no);
+	    }
+	    return noStr;
+	}
 
 	public static void main(String args[]) throws Exception {
 		//long t1 = System.currentTimeMillis();
@@ -294,7 +302,7 @@ public class ToolUtil {
 		//	Map<String,String> detail = (Map<String,String>)resultMap.get("data");
 		//	String country = detail.get("country");
 		//}
-		Map maps = getAddressByIP("117.82.187.111");
-		System.out.println(JSONObject.toJSONString(maps));
+	        String policyNo = getPolicyNo(00012300000);
+		System.out.println(JSONObject.toJSONString(policyNo));
 	}
 }

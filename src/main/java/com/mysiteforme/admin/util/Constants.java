@@ -41,5 +41,7 @@ public class Constants {
 	 * 评论类型：2.系统留言
 	 */
 	public static final Integer COMMENT_TYPE_LEVING_A_MESSAGE = 2;
+	
+	public static final String WEB_IP ="http://39.98.205.174/images/head/";
 
 }

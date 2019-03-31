@@ -84,11 +84,11 @@
             cols: [[
                 {type:'checkbox'},
                 {field:'policyNo', title: '保单号'},
-                {field:'startNo',  title: 'NO.起始值'},
+                {field:'startNoStr',  title: 'NO.起始值'},
                 {field:'noTotal',  title: 'NO.总数量'},
                 {field:'allocationNumber',     title: 'NO.已分配数量'},
                 {field:'noNumber',       title: '创建保单数量'},
-                {field:'newNo',       title: '最新小保单号'},
+                {field:'newNoStr',       title: '最新小保单号'},
                 {field:'enableState',    title: '启用状态',templet:'#enableState'},
                 {field:'createDate',  title: '创建时间',templet:'<div>{{ layui.laytpl.toDateString(d.createDate)}}</div>',unresize: true}, //单元格内容水平居中
                 {fixed: 'right', title: '操作',width: '10%',align: 'center',toolbar: '#barDemo'}
@@ -139,35 +139,6 @@
             }
         });
         
-        //功能按钮
-        var active={
-            deleteSome : function(){                        //批量删除
-                var checkStatus = table.checkStatus('test'),
-                     data = checkStatus.data;
-                if(data.length > 0){
-                    layer.confirm("你确定要删除这些日志么？",{btn:['是的,我确定','我再想想']},
-                        function(){
-                            var d = [];
-                            for(var i=0;i<data.length;i++){
-                                d.push(data[i].id);
-                            }
-                            $.post("${base}/admin/system/log/delete",{ids:d},function (res) {
-                                if(res.success){
-                                    layer.msg("删除成功",{time: 1000},function(){
-                                        table.reload('test', t);
-                                    });
-                                }else{
-                                    layer.msg(res.message);
-                                }
-                            });
-                        }
-                    )
-                }else{
-                    layer.msg("请选择需要删除的日志",{time:1000});
-                }
-            }
-        };
-        
         var activeAdd={
         		addSalesSlip : function(){
                     var addIndex = layer.open({
@@ -188,7 +159,6 @@
 
         $('.layui-inline .layui-btn').on('click', function(){
             var type = $(this).data('type');
-            active[type] ? active[type].call(this) : '';
             activeAdd[type] ? activeAdd[type].call(this) : '';
             activeExport[type] ? activeExport[type].call(this) : '';
         });

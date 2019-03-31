@@ -7,15 +7,22 @@ package com.mysiteforme.admin.entity.VO;
  * @author 邹立强   (zoulq@cloud-young.com)
  * <p>Copyright (c) Department of Research and Development/Beijing.</p>
  */
-public class SummarySalesSlip implements java.io.Serializable{
+public class SummarySalesSlip{
 
-    private static final long serialVersionUID = 8864867087900128347L;
+    private Integer index=0;
     
     private String authorizedOutlets;
-    
     private String name;
     
     private Integer num;
+    
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
 
     public String getAuthorizedOutlets() {
         return authorizedOutlets;

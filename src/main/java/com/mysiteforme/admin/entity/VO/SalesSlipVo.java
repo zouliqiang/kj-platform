@@ -4,9 +4,6 @@ import com.mysiteforme.admin.entity.SalesSlip;
 
 public class SalesSlipVo extends SalesSlip{
 
-    /**
-     * TODO
-     */
     private static final long serialVersionUID = -8363067474873977379L;
     
     /**

@@ -41,7 +41,7 @@
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
         <div class="layui-inline">
-            <a class="layui-btn layui-btn-normal" data-type="addSalesSlip">分配保单号</a>
+            <a class="layui-btn layui-btn-normal" data-type="policyNoUser">分配保单号</a>
         </div>
  </form>
     </div>
@@ -107,72 +107,11 @@
                         },500);
                     }
                 });
-/*                 //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-                $(window).resize(function(){
-                    layer.full(editIndex);
-                });
-                layer.full(editIndex);
- */            }
-            
-            if(obj.event === 'print'){
-                window.open("${base}/admin/salesslip/print?id="+parseInt(data.id));
-            }
-            
-            
-            if(obj.event === "del"){
-                layer.confirm("你确定要删除该日志么？",{btn:['是的,我确定','我再想想']},
-                    function(){
-                        $.post("${base}/admin/system/log/delete",{"ids":[data.id]},function (res){
-                           if(res.success){
-                               layer.msg("删除成功",{time: 1000},function(){
-                                   table.reload('test', t);
-                               });
-                           }else{
-                               layer.msg(res.message);
-                           }
-
-                        });
-                    }
-                )
-            }
+          }
         });
-        var activeExport={
-        		exportSalesSlip : function(){
-        		   	window.location.href="${base}/admin/salesslip/export?s_custometype="+$("#custometype").val()+"&s_no="+$("#no").val()+"&s_customername="+$("#customername").val();
-                }
-            };
-        
-        //功能按钮
-        var active={
-            deleteSome : function(){                        //批量删除
-                var checkStatus = table.checkStatus('test'),
-                     data = checkStatus.data;
-                if(data.length > 0){
-                    layer.confirm("你确定要删除这些日志么？",{btn:['是的,我确定','我再想想']},
-                        function(){
-                            var d = [];
-                            for(var i=0;i<data.length;i++){
-                                d.push(data[i].id);
-                            }
-                            $.post("${base}/admin/system/log/delete",{ids:d},function (res) {
-                                if(res.success){
-                                    layer.msg("删除成功",{time: 1000},function(){
-                                        table.reload('test', t);
-                                    });
-                                }else{
-                                    layer.msg(res.message);
-                                }
-                            });
-                        }
-                    )
-                }else{
-                    layer.msg("请选择需要删除的日志",{time:1000});
-                }
-            }
-        };
         
         var activeAdd={
-        		addSalesSlip : function(){
+        		policyNoUser : function(){
                     var addIndex = layer.open({
                         title : "选择用户",
                         type : 2,
@@ -195,7 +134,6 @@
 
         $('.layui-inline .layui-btn').on('click', function(){
             var type = $(this).data('type');
-            active[type] ? active[type].call(this) : '';
             activeAdd[type] ? activeAdd[type].call(this) : '';
         });
 

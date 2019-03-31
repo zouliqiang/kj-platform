@@ -32,5 +32,10 @@ public class PolicyNoServiceImpl extends ServiceImpl<PolicyNoDao, PolicyNo> impl
     public PolicyNo getActivePolicyNo() {
         return policyNoDao.getActivePolicyNo();
     }
+
+    @Override
+    public PolicyNo getPolicyNoByPolicyNo(String policyNo) {
+        return policyNoDao.getPolicyNoByPolicyNo(policyNo);
+    }
    
 }

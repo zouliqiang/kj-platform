@@ -18,7 +18,7 @@
 <body class="childrenBody">
 <div style="text-align: center; padding:11% 0;">
     <i class="layui-icon" style="line-height:20rem; font-size:20rem; color: #393D50;">&#xe69c;</i>
-    <p style="font-size: 20px; font-weight: 300; color: #999;">发生系统错误,请联系管理员</p>
+    <p style="font-size: 20px; font-weight: 300; color: #999;">暂无权限</p>
         <pre class="layui-code">
             ${message}
         </pre>
@@ -27,7 +27,7 @@
 <script>
     layui.use('code', function(){ //加载code模块
         layui.code({
-            title:'Exception',
+            title:'暂无权限',
             encode:true
         }); //引用code方法
     });

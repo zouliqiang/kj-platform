@@ -78,15 +78,7 @@ public class FileController {
         String url = null;
         Map m = Maps.newHashMap();
         try {
-            if("local".equals(site.getFileUploadType())){
-                url = localService.upload(file);
-            }
-            if("qiniu".equals(site.getFileUploadType())){
-                url = qiniuService.upload(file);
-            }
-            if("oss".equals(site.getFileUploadType())){
-                url = ossService.upload(file);
-            }
+            url = localService.upload(file);
             m.put("url", url);
             m.put("name", file.getOriginalFilename());
         } catch (Exception e) {

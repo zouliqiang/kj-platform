@@ -47,5 +47,10 @@ public class PolicyNoUserServiceImpl extends ServiceImpl<PolicyNoUserDao, Policy
     public Integer getUserTotal(Map<String, Object> paramMap) {
         return policyNoUserDao.getUserTotal(paramMap);
     }
+
+    @Override
+    public PolicyNoUser getPolicyNoUser(Map<String, Object> map) {
+        return policyNoUserDao.getPolicyNoUser(map);
+    }
    
 }

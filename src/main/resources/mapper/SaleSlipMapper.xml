@@ -75,7 +75,7 @@
      
     <select id="getSummarySalesSlip" parameterType="java.util.Map" resultType="com.mysiteforme.admin.entity.VO.SummarySalesSlip">
      select
-		"网点名称" as authorizedOutlets,
+		su.website as authorizedOutlets,
 		su.login_name as name,
 		count(1) as num
 		from sales_slip ss left join sys_user su on ss.create_by=su.id
