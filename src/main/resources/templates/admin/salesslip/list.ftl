@@ -125,7 +125,6 @@
                 {field:'customerMobile',       title: '联系电话'},
                 {field:'insuranceStartDate',    title: '保险开始时间',templet:'<div>{{ layui.laytpl.toDateString(d.insuranceStartDate,"yyyy-MM-dd")}}</div>',unresize: true},
                 {field:'insuranceEndDate',    title: '保险结束时间',templet:'<div>{{ layui.laytpl.toDateString(d.insuranceEndDate,"yyyy-MM-dd")}}</div>',unresize: true},
-                {field:'productNo',       title: '产品SN码'},
                 {field:'name',    title: '录入人'},
                 {field:'createDate',  title: '录入时间',templet:'<div>{{ layui.laytpl.toDateString(d.createDate)}}</div>',unresize: true}, //单元格内容水平居中
                 {fixed: 'right', title: '操作',width: '10%',align: 'center',toolbar: '#barDemo'}
