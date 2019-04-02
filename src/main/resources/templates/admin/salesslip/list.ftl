@@ -77,8 +77,10 @@
 </fieldset>
 <div class="layui-form users_list">
     <table class="layui-table" id="test" lay-filter="demo"></table>
+   <script type="text/html" id="barDemo2">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="print"><i class="layui-icon">&#xe638;</i></a>   
+    </script>
     <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="print">打印</a>
         <a class="layui-btn layui-btn layui-btn-xs" lay-event="look">查看</a>
         <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">编辑</a>
     </script>
@@ -118,13 +120,14 @@
             },
             width: $(parent.window).width()-223,
             cols: [[
-                {type:'checkbox'},
+            	{fixed: 'right', title: '打印',width: '10%',align: 'center',toolbar: '#barDemo2'},
                 {field:'policyNo', title: '保单号'},
                 {field:'no',  title: 'NO.'},
                 {field:'customerName',     title: '客户名字'},
                 {field:'customerMobile',       title: '联系电话'},
                 {field:'insuranceStartDate',    title: '保险开始时间',templet:'<div>{{ layui.laytpl.toDateString(d.insuranceStartDate,"yyyy-MM-dd")}}</div>',unresize: true},
                 {field:'insuranceEndDate',    title: '保险结束时间',templet:'<div>{{ layui.laytpl.toDateString(d.insuranceEndDate,"yyyy-MM-dd")}}</div>',unresize: true},
+                {field:'productNo',       title: '产品SN码'},
                 {field:'name',    title: '录入人'},
                 {field:'createDate',  title: '录入时间',templet:'<div>{{ layui.laytpl.toDateString(d.createDate)}}</div>',unresize: true}, //单元格内容水平居中
                 {fixed: 'right', title: '操作',width: '10%',align: 'center',toolbar: '#barDemo'}
