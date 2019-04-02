@@ -26,17 +26,19 @@
 	<div class="container"  id="printDiv">
 		<div class="content">
 			<div class="chapter1">
-				<img src="${base}/static/images/seal2.png">
-			</div>
-			<div class="chapter2">
 				<img src="${base}/static/images/seal1.png">
 			</div>
-			<div class="title">全车盗抢综合保险客户服务单</div>
+			<div class="chapter2">
+				<img src="${base}/static/images/seal2.png">
+			</div>
+			<div class="title"><img src="${base}/static/images/renshou.png">
+			<br>
+			全车盗抢综合保险客户服务单</div><br><br><br>
 			<div class="guaranteeNum">
 				<span> 保单号： </span> <span>${salesSlip.policyNo}</span>
 			</div>
 			<div class="guaranteeNum guaranteeNum-No">
-				<span> NO. </span>： <span>${salesSlip.no}</span>
+				<span> NO. </span>： <span style="font-weight: bold;font-size: 18px;color:red;">${salesSlip.no}</span>
 			</div>
 			<div class="table-content">
 				<p class="desc">请您准确、完整的填写全车盗抢综合保险客户服务单表格列明的信息，并对填写真实有效性负责，否则，由此产生的责任将由您自行承担</p>
@@ -45,7 +47,7 @@
 						<td class="nameTd">客户名称</td>
 						<td class="">${salesSlip.customerName}</td>
 						<td class="nameTd">证件类型/号码</td>
-						<td><#if salesSlip.certificateType == 1>身份证<#else>组织机构代码</#if>/${salesSlip.certificateNo}</td>
+						<td>${salesSlip.certificateNo}</td>
 					</tr>
 					<tr>
 						<td class="nameTd">联系电话</td>
@@ -88,16 +90,16 @@
 			<div class="detail-content">
 				<div class="title">中国人寿财产保险股份有限公司全车盗抢责任承保声明</div>
 				<div class="detail detail1">
-					<span>保障范围：</span>凡在中华人民共和国境内安装了河北酷嘉汽车服务有限公司销售的酷嘉车载智能终端产品的车辆，该车辆必须手续齐全，合法有效。
+					<span class="title-next">保障范围：</span>凡在中华人民共和国境内安装了河北酷嘉汽车服务有限公司销售的酷嘉车载智能终端产品的车辆，该车辆必须手续齐全，合法有效。
 				</div>
 				<div class="detail detail2">
-					<span>保险期限:</span> <span class="year">${salesSlip.insuranceTerm}</span>年，自设备安装之日起生效，在保险期间内如发生车辆转让，保险责任终止；车辆所有人或管理人应及时通知河北酷嘉汽车服务有限公司办理变更手续，手续变更次日零时保险责任恢复，否则保险人不承担赔偿责任。
+					<span class="title-next">保险期限:</span> <span class="year"> <#if salesSlip.insuranceTerm == 1>壹<#elseif salesSlip.insuranceTerm == 2>贰<#else>叁</#if> </span>年，自设备安装之日起生效，在保险期间内如发生车辆转让，保险责任终止；车辆所有人或管理人应及时通知河北酷嘉汽车服务有限公司办理变更手续，手续变更次日零时保险责任恢复，否则保险人不承担赔偿责任。
 				</div>
 				<div class="detail detail3">
-					<span>保险责任：</span>保险合同（保单号：<span class="guarantee-slip">${salesSlip.policyNo}</span>）项下约定的责任，即保障范围内车辆被全车盗窃、抢劫、抢夺，经县级以上公安刑侦部门立案证实，满三个月未查明下落的，保险人根据保险合同约定进行赔偿。
+					<span class="title-next">保险责任：</span>保险合同（保单号：<span class="guarantee-slip">${salesSlip.policyNo}</span>）项下约定的责任，即保障范围内车辆被全车盗窃、抢劫、抢夺，经县级以上公安刑侦部门立案证实，满三个月未查明下落的，保险人根据保险合同约定进行赔偿。
 				</div>
 				<div class="detail detail4">
-					<span>赔偿处理：</span><br>
+					<span class="title-next">赔偿处理：</span><br>
 					1.出险车辆未购买盗抢险的，按被盗车辆折旧后价格的100%进行赔偿；出险车辆已购买盗抢险的，在机动车辆保险先行赔付的前提下，本保险对机动车盗抢险20%免赔部分在赔偿限额内进行差额赔付。折旧率计算方法参照中国人寿财产保险股份有限公司机动车辆保险对应的车辆种类或型号和折旧率。<br>
 					2.我公司确认索赔单证齐全有效后20个工作日内支付赔款。获取赔款后，运营商及车主应协助我公司向责任者进行追偿。本保险赔偿限额最高为RMB
 					<span class="money"><#setting number_format="0.00">${(salesSlip.compensatePrice/10000)?string("0.####")}</span> 万元。<br>
@@ -105,18 +107,18 @@
 						class="people">${salesSlip.firstBeneficiary}</span>
 				</div>
 				<div class="detail detail5">
-					<span>有关义务：</span><br>
+					<span class="title-next">有关义务：</span><br>
 					发生全车被盗抢后，车辆所有人应在24小时内向当地公安机关报案。车辆被盗后应当通过河北酷嘉汽车服务有限公司向保险人索赔。索赔时，车主必须提供车辆保险单证复印件（包括交强险）、受损人驾驶证及身份证复印件、机动车行驶证、机动车登记证书、购车原始发票、车辆购置税完税证明或免税证明、保险证明（全车盗抢责任承保声明），被盗抢原车的钥匙、公安机关立案证明、未破案证明、机动车钥匙及机动车所有权权益转让书（由车主向中国人寿财险北京分公司转让）、保险人要求的其他材料。
 				</div>
 				<div class="detail detail6">
-					<span>除外责任：</span><br> 1、非全车遭受盗抢，仅车上零部件或附属设备被盗抢、被损坏；<br>
+					<span class="title-next">除外责任：</span><br> 1、非全车遭受盗抢，仅车上零部件或附属设备被盗抢、被损坏；<br>
 					2、被他人诈骗造成全车或部分损失；<br> 3、车主因违反政府有关法律、法规，车辆被有关国家机关罚没、扣押；<br>
 					4、车主因与他人的民事、经济纠纷而被抢劫、抢夺；<br> 5、租赁车辆与承租人同时失踪；<br>
 					6、车主的故意行为；<br> 7、客户违反本产品中规定的操作规程或擅自拆卸等引起的损失；<br>
 					8、产品用户未按时交纳移动通信费用被停机，导致该设备无法正常工作的；<br> 9、除保险责任外的其他一切责任；<br>
 				</div>
 				<div class="detail detail7">
-					<span>保险人：</span>中国人寿财产保险股份有限公司北京市分公司 <br> 地
+					<span class="title-next">保险人：</span>中国人寿财产保险股份有限公司北京市分公司 <br> 地
 					址：北京市朝阳区朝外大街16号中国人寿大厦15层 <br> 保险服务咨询：010-95519
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 河北酷嘉服务咨询电话：0311-68033315
 				</div>
@@ -146,7 +148,7 @@
 	width: 160px;
 	height: 160px;
 	position: absolute;
-	bottom: 130px;
+	bottom: 40px !important;
 	z-index: 100;
 }
 
@@ -167,8 +169,7 @@
 	height: 30px;
 	line-height: 30px;
 	text-align: center;
-	font-weight: bold;
-	font-size: 26px;
+	font-size: 24px;
 }
 
 .guaranteeNum {
@@ -180,7 +181,7 @@
 	margin: 10px 0 0;
 	text-align: right;
 	color: #333;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 .guaranteeNum span:first-child {
@@ -189,7 +190,7 @@
 }
 
 .guaranteeNum span:last-child {
-	color: red;
+	color: black;
 	font-size: 14px;
 	width: 170px;
 	text-align: left;
@@ -242,7 +243,6 @@
 	height: 28px;
 	line-height: 28px;
 	font-size: 16px;
-	font-weight: bold;
 }
 
 .detail-content .detail {
@@ -284,12 +284,15 @@
 }
 
 .detail .guarantee-slip {
-	color: red;
+	color: balck;
 	font-weight: normal;
 }
 
 .detail-bottom {
 	font-size: 13px;
+}
+.title-next{
+   font-weight: bold;
 }
 </style>
 	<script type="text/javascript"

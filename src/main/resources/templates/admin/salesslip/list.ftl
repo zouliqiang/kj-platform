@@ -44,6 +44,19 @@
                 <input type="text" value="" name="s_customername" id ="customername" placeholder="请输入客户姓名" class="layui-input search_input">
             </div>
         </div>
+         <div class="layui-inline" style="margin-left: 15px">
+            <label>录入人:</label>
+            <div class="layui-input-inline">
+                <input type="text" value="" name="s_entry" id ="entry" placeholder="请输入录入人" class="layui-input search_input">
+            </div>
+        </div>
+         <div class="layui-inline">
+      <label class="layui-form-label">保险区间</label>
+      <div class="layui-input-inline">
+        <input type="text" class="layui-input" id="test6" name="s_insurance_range" placeholder=" - ">
+      </div>
+        </div>
+        
         <div class="layui-inline">
             <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
         </div>
@@ -77,13 +90,20 @@
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
 <script type="text/javascript" src="${base}/static/js/tools.js"></script>
 <script>
-    layui.use(['layer','form','table'], function() {
+    layui.use(['layer','form','table','laydate'], function() {
         var layer = layui.layer,
                 $ = layui.jquery,
                 form = layui.form,
+                laydate = layui.laydate,
                 table = layui.table,
                 t;                  //表格数据变量
-
+         //日期范围
+        laydate.render({
+            type: 'month',
+            elem: '#test6' ,
+            range: true,
+            theme: '#393D49'  //自定义主题颜色
+        });
         t = {
             elem: '#test',
             url:'${base}/admin/salesslip/list',
@@ -103,10 +123,9 @@
                 {field:'no',  title: 'NO.'},
                 {field:'customerName',     title: '客户名字'},
                 {field:'customerMobile',       title: '联系电话'},
-                {field:'compensatePrice',    title: '赔付限额'},
-                {field:'licencePlateNo',    title: '车牌号码'},
                 {field:'insuranceStartDate',    title: '保险开始时间',templet:'<div>{{ layui.laytpl.toDateString(d.insuranceStartDate,"yyyy-MM-dd")}}</div>',unresize: true},
                 {field:'insuranceEndDate',    title: '保险结束时间',templet:'<div>{{ layui.laytpl.toDateString(d.insuranceEndDate,"yyyy-MM-dd")}}</div>',unresize: true},
+                {field:'productNo',       title: '产品SN码'},
                 {field:'name',    title: '录入人'},
                 {field:'createDate',  title: '录入时间',templet:'<div>{{ layui.laytpl.toDateString(d.createDate)}}</div>',unresize: true}, //单元格内容水平居中
                 {fixed: 'right', title: '操作',width: '10%',align: 'center',toolbar: '#barDemo'}

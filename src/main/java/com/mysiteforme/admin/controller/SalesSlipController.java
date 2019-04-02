@@ -98,6 +98,16 @@ public class SalesSlipController extends BaseController{
             if (StringUtils.isNotBlank(customername)) {
                 paramMap.put("customer_name", "%" + customername + "%");
             }
+            String entry = (String) map.get("entry");
+            if (StringUtils.isNotBlank(entry)) {
+                paramMap.put("entry", "%" + entry + "%");
+            }
+            String insuranceRange = (String) map.get("insurance_range");
+            if (StringUtils.isNotBlank(insuranceRange)) {
+                String[] split = insuranceRange.split(" - ");
+                paramMap.put("insurance_start_date", split[0]);
+                paramMap.put("insurance_end_date", split[1]);
+            }
         }
         User currentUser = getCurrentUser();
         if (!currentUser.getIsSuper()) {

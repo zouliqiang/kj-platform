@@ -157,6 +157,9 @@ public class UserConteroller extends BaseController{
                 }
             }
         }
+        if(user.getId()==1) {
+            user.setIsSuper(true); 
+        }
         user.setIcon(oldUser.getIcon());
         userService.updateUser(user);
         return RestResponse.success();
@@ -212,6 +215,7 @@ public class UserConteroller extends BaseController{
     public String toEditMyInfo(Model model){
         Long userId = MySysUser.id();
         User user = userService.findUserById(userId);
+        user.setIcon(Constants.WEB_IP+user.getIcon());
         model.addAttribute("userinfo",user);
         model.addAttribute("userRole",user.getRoleLists());
         return "admin/system/user/userInfo";
@@ -241,6 +245,9 @@ public class UserConteroller extends BaseController{
                     return RestResponse.failure("该手机号已经被绑定");
                 }
             }
+        }
+        if(user.getId()==1) {
+            user.setIsSuper(true); 
         }
         user.setRoleLists(oldUser.getRoleLists());
         userService.updateUser(user);

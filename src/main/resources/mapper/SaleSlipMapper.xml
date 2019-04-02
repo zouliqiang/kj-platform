@@ -49,6 +49,15 @@
 		<if test="customer_name!= null and customer_name!='' ">
 			and ss.customer_name like #{customer_name}
 		</if>
+		<if test="entry!= null and entry!='' ">
+			and su.login_name like #{entry}
+		</if>
+		<if test="insurance_start_date!= null and insurance_start_date!='' ">
+			and ss.insurance_start_date &gt;= #{insurance_start_date}
+		</if>
+		<if test="insurance_end_date!= null and insurance_end_date!='' ">
+			and ss.insurance_end_date &lt;= #{insurance_end_date}
+		</if>
 		<if test="limit!= null and limit!='' ">
 			limit #{pageStart},#{limit}
 		</if>
