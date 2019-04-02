@@ -18,6 +18,7 @@
 		ss.licence_plate_no as licencePlateNo,
 		ss.vehicle_frame_no as vehicleFrameNo,
 		ss.engine_frame_no as engineFrameNo,
+		ss.registration_date as registrationDate,
 		ss.vehicle_price as vehiclePrice,
 		ss.install_date as installDate,
 		ss.install_address as installAddress,
