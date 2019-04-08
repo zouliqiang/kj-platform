@@ -217,7 +217,7 @@ public class PolicyNoUserController extends BaseController {
      * 2019年3月31日 下午10:19:57
      */
     @GetMapping("look")
-    public String edit(Long id, Model model) {
+    public String look(Long id, Model model) {
         User currentUser = getCurrentUser();
         if (id == null) {
             model.addAttribute("message", "暂无权限");
@@ -234,5 +234,69 @@ public class PolicyNoUserController extends BaseController {
         }
         model.addAttribute("PolicyNoUser", PolicyNoUser);
         return "/admin/policyouser/look";
+    }
+    
+    
+    /**
+     * @Description 进入编辑分配保单页面 
+     * @return String     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年4月8日 下午11:36:07
+     */
+    @GetMapping("edit")
+    public String edit(Long id, Model model) {
+        User currentUser = getCurrentUser();
+        if (id == null) {
+            model.addAttribute("message", "暂无权限");
+            return "/admin/error/500";
+        }
+        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != id.intValue()) {
+            model.addAttribute("message", "暂无权限");
+            return "/admin/error/500";
+        }
+        PolicyNoUser PolicyNoUser = policyNoUserService.selectById(id);
+        if (PolicyNoUser == null) {
+            model.addAttribute("message", "暂无保单号信息");
+            return "/admin/error/500";
+        }
+        model.addAttribute("PolicyNoUser", PolicyNoUser);
+        return "/admin/policynouser/edit";
+    }
+    
+    /**
+     * @Description 编辑保单号信息 
+     * @param policyNo
+     * @return RestResponse     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年3月31日 下午10:16:26
+     */
+    @RequiresPermissions("policynouser:edit")
+    @PostMapping("edit")
+    @SysLog("编辑保单号分配数据")
+    @ResponseBody
+    public RestResponse edit(@RequestBody PolicyNoUser policyNoUser) {
+        PolicyNoUser getPolicyNoUser = policyNoUserService.selectById(policyNoUser.getId());
+        Date date = new Date();
+        if(getPolicyNoUser==null) {
+            return RestResponse.failure("暂无修改权限");
+        }
+        if(getPolicyNoUser.getUseNumber()>policyNoUser.getAllocationNumber().intValue()) {
+            return RestResponse.failure("No.分配数量不能小于创建保单数量"); 
+        }
+        PolicyNo policyNoByPolicyNo = policyNoService.getPolicyNoByPolicyNo(getPolicyNoUser.getPolicyNo());
+        Integer noTotal = policyNoByPolicyNo.getNoTotal();
+        Integer allocationNumber = policyNoByPolicyNo.getAllocationNumber();
+        if(noTotal.intValue()-allocationNumber.intValue()<policyNoUser.getAllocationNumber().intValue()-getPolicyNoUser.getAllocationNumber().intValue()) {
+            return RestResponse.failure("No.分配数量不能大于保单所剩数量，可提高No.总数量");   
+        }
+        policyNoByPolicyNo.setAllocationNumber(policyNoByPolicyNo.getAllocationNumber()-getPolicyNoUser.getAllocationNumber()+policyNoUser.getAllocationNumber());
+        User currentUser = getCurrentUser();
+        policyNoUser.setUpdateDate(date);
+        policyNoUser.setUpdateId(currentUser.getId());
+        policyNoUserService.updateById(policyNoUser);
+        policyNoService.updateById(policyNoByPolicyNo);
+        return RestResponse.success();
     }
 }

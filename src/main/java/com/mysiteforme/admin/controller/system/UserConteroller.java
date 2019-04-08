@@ -249,6 +249,10 @@ public class UserConteroller extends BaseController{
         if(user.getId()==1) {
             user.setIsSuper(true); 
         }
+        if(StringUtils.isNotBlank(user.getIcon())) {
+            int one = user.getIcon().lastIndexOf("/");
+            user.setIcon(user.getIcon().substring((one+1),user.getIcon().length()));
+        }
         user.setRoleLists(oldUser.getRoleLists());
         userService.updateUser(user);
         return RestResponse.success();

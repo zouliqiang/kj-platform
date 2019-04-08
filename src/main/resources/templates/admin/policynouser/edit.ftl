@@ -30,17 +30,18 @@
 </head>
 <body class="childrenBody">
 <form class="layui-form" style="width:70%;">
+    <input value="${PolicyNoUser.id}" name="id" type="hidden">
      <div class="layui-form-item">
-        <label class="layui-form-label">No.总数量</label>
+        <label class="layui-form-label">No.已分配数量</label>
         <div class="layui-input-block">
-            <input  type="text"  class="layui-input" name="vehiclePrice"  maxlength="20" value="${salesSlip.vehiclePrice}" readonly="readonly"  lay-verify="required|number">
+            <input  type="text"  class="layui-input" name="allocationNumber"  maxlength="20" value="${PolicyNoUser.allocationNumber}"   lay-verify="required|number">
         </div>
     </div>
     </div>
-        <div class="layui-form-item">
-        <label class="layui-form-label">安装地点</label>
+     <div class="layui-form-item">
         <div class="layui-input-block">
-            <input  type="text"  class="layui-input" name="installAddress" maxlength="200" value="${salesSlip.installAddress}" readonly="readonly"  lay-verify="required">
+            <button class="layui-btn" lay-submit="" lay-filter="editPolicyNoUser">保存</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
     </div>
     </div>
@@ -52,6 +53,32 @@
                 $     = layui.jquery,
                 laydate = layui.laydate,
                 layer = layui.layer;
+        form.on("submit(editPolicyNoUser)",function(data){
+     	   
+         var loadIndex = layer.load(2, {
+             shade: [0.3, '#333']
+         });
+         $.ajax({
+             url:"${base}/admin/policynouser/edit",
+             type:"POST",
+             data:JSON.stringify(data.field),
+             contentType:"application/json; charset=utf-8",
+             dataType:"json",
+             success: function(res){
+                 layer.close(loadIndex);
+                 if(res.success){
+                     parent.layer.msg("保单号分配编辑成功！",{time:1000},function(){
+                         parent.layer.close(parent.addIndex);
+                         //刷新父页面
+                         parent.location.reload();
+                     });
+                 }else{
+                     layer.msg(res.message);
+                 }
+             }
+         });
+         return false;
+     });
     });
 </script>
 </body>

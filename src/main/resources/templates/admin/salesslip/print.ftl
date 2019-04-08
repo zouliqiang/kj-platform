@@ -45,45 +45,45 @@
 				<table border="1">
 					<tr>
 						<td class="nameTd">客户名称</td>
-						<td class="">${salesSlip.customerName}</td>
+						<td class="nameTdC">${salesSlip.customerName}</td>
 						<td class="nameTd">证件类型/号码</td>
-						<td>${salesSlip.certificateNo}</td>
+						<td class="nameTdD">${salesSlip.certificateNo}</td>
 					</tr>
 					<tr>
 						<td class="nameTd">联系电话</td>
-						<td class="">${salesSlip.customerMobile}</td>
+						<td class="nameTdC">${salesSlip.customerMobile}</td>
 						<td class="nameTd">通讯地址</td>
-						<td>${salesSlip.customerAddress}</td>
+						<td class="nameTdD">${salesSlip.customerAddress}</td>
 					</tr>
 					<tr>
 						<td class="nameTd">车辆品牌/型号</td>
-						<td class="">${salesSlip.vehicleBrand}</td>
+						<td class="nameTdC">${salesSlip.vehicleBrand}</td>
 						<td class="nameTd">车架号（VIN码）</td>
-						<td>${salesSlip.vehicleFrameNo}</td>
+						<td class="nameTdD">${salesSlip.vehicleFrameNo}</td>
 					</tr>
 					<tr>
 						<td class="nameTd">车 牌 号</td>
-						<td class="">${salesSlip.licencePlateNo}</td>
+						<td  class="nameTdC">${salesSlip.licencePlateNo}</td>
 						<td class="nameTd">发动机号</td>
-						<td>${salesSlip.engineFrameNo}</td>
+						<td class="nameTdD">${salesSlip.engineFrameNo}</td>
 					</tr>
 					<tr>
 						<td class="nameTd">登记日期</td>
-						<td class="">${(salesSlip.registrationDate?string("yyyy-MM-dd"))!}</td>
+						<td class="nameTdC">${(salesSlip.registrationDate?string("yyyy-MM-dd"))!}</td>
 						<td class="nameTd">初始购车价</td>
-						<td>${salesSlip.vehiclePrice}</td>
+						<td class="nameTdD">${salesSlip.vehiclePrice}</td>
 					</tr>
 					<tr>
 						<td class="nameTd">安装日期</td>
-						<td class="">${(salesSlip.installDate?string("yyyy-MM-dd"))!}</td>
+						<td class="nameTdC">${(salesSlip.installDate?string("yyyy-MM-dd"))!}</td>
 						<td class="nameTd">安装地点</td>
-						<td>${salesSlip.installAddress}</td>
+						<td class="nameTdD">${salesSlip.installAddress}</td>
 					</tr>
 					<tr>
 						<td class="nameTd">安装人</td>
-						<td class="">${salesSlip.installser}</td>
+						<td class="nameTdC">${salesSlip.installser}</td>
 						<td class="nameTd">产品SN 码</td>
-						<td>${salesSlip.productNo}</td>
+						<td class="nameTdD">${salesSlip.productNo}</td>
 					</tr>
 				</table>
 			</div>
@@ -158,7 +158,7 @@
 
 .content .chapter2 {
 	bottom: 150px;
-	right: 40px;
+	right: 145px;
 }
 
 .content .chapter1 img, .content .chapter2 img {
@@ -231,6 +231,7 @@
 	width: 250px;
 }
 
+
 .detail-content {
 	width: 100%;
 	margin: 10px auto 0;
@@ -293,6 +294,12 @@
 }
 .title-next{
    font-weight: bold;
+}
+.nameTdC{
+width: 100px !important;
+}
+.nameTdD{
+width: 300px !important;
 }
 </style>
 	<script type="text/javascript"

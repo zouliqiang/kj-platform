@@ -86,7 +86,7 @@
                 {field:'allocationNumber',     title: 'NO.已分配数量'},
                 {field:'useNumber',       title: '创建保单数量'},
                 {field:'createDate',  title: '创建时间',templet:'<div>{{ layui.laytpl.toDateString(d.createDate)}}</div>',unresize: true}, //单元格内容水平居中
-                /* {fixed: 'right', title: '操作',width: '10%',align: 'center',toolbar: '#barDemo'} */
+                {fixed: 'right', title: '操作',width: '10%',align: 'center',toolbar: '#barDemo'} 
             ]]
         };
         table.render(t);
@@ -96,9 +96,10 @@
         	var data = obj.data;
             if(obj.event === 'edit'){
                 var editIndex = layer.open({
-                    title : "编辑保单号",
+                    title : "编辑已分配保单",
                     type : 2,
-                    content : "${base}/admin/policyno/edit?id="+parseInt(data.id),
+                    area: ['500px', '200px'],
+                    content : "${base}/admin/policynouser/edit?id="+parseInt(data.id),
                     success : function(layero, index){
                         setTimeout(function(){
                             layer.tips('点击此处返回保单号设置列表', '.layui-layer-setwin .layui-layer-close', {
