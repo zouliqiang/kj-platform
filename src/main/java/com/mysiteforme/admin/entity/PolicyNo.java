@@ -41,19 +41,19 @@ public class PolicyNo implements java.io.Serializable {
      * NO.总数量
      */
     @TableField("no_total")
-    private Integer noTotal=0;
+    private Integer noTotal;
 
     /**
      * NO.已分配数量
      */
     @TableField("allocation_number")
-    private Integer allocationNumber=0;
+    private Integer allocationNumber;
     
     /**
      * NO.当前保单数量
      */
     @TableField("no_number")
-    private Integer noNumber=0; 
+    private Integer noNumber; 
     
     /**
      * 最新NO.
