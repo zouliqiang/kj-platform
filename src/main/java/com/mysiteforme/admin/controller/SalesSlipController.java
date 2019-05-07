@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -31,6 +32,7 @@ import com.mysiteforme.admin.entity.PolicyNo;
 import com.mysiteforme.admin.entity.PolicyNoUser;
 import com.mysiteforme.admin.entity.SalesSlip;
 import com.mysiteforme.admin.entity.SalesSlipExport;
+import com.mysiteforme.admin.entity.SalesSlipHistory;
 import com.mysiteforme.admin.entity.User;
 import com.mysiteforme.admin.entity.VO.SalesSlipVo;
 import com.mysiteforme.admin.entity.VO.SummarySalesSlip;
@@ -86,27 +88,27 @@ public class SalesSlipController extends BaseController{
         paramMap.put("pageStart", (page - 1) * limit);
         paramMap.put("limit", limit);
         if (!map.isEmpty()) {
-            String customeType = (String) map.get("custometype");
-            if (StringUtils.isNotBlank(customeType)) {
-                paramMap.put("customer_type", customeType);
-            }
-            String no = (String) map.get("no");
-            if (StringUtils.isNotBlank(no)) {
-                paramMap.put("no", no);
-            }
             String customername = (String) map.get("customername");
             if (StringUtils.isNotBlank(customername)) {
                 paramMap.put("customer_name", "%" + customername + "%");
             }
-            String entry = (String) map.get("entry");
-            if (StringUtils.isNotBlank(entry)) {
-                paramMap.put("entry", "%" + entry + "%");
+            String certificateNo = (String) map.get("certificateNo");
+            if (StringUtils.isNotBlank(certificateNo)) {
+                paramMap.put("certificate_no",certificateNo);
+            }
+            String tel = (String) map.get("tel");
+            if (StringUtils.isNotBlank(tel)) {
+                paramMap.put("tel", tel );
+            }
+            String website = (String) map.get("website");
+            if (StringUtils.isNotBlank(website)) {
+                paramMap.put("website", "%" + certificateNo + "%");
             }
             String insuranceRange = (String) map.get("insurance_range");
             if (StringUtils.isNotBlank(insuranceRange)) {
                 String[] split = insuranceRange.split(" - ");
-                paramMap.put("insurance_start_date", split[0]);
-                paramMap.put("insurance_end_date", split[1]);
+                paramMap.put("insurance_start_date", split[0]+" 00:00:00");
+                paramMap.put("insurance_end_date", split[1]+" 23:59:59");
             }
         }
         User currentUser = getCurrentUser();
@@ -189,6 +191,8 @@ public class SalesSlipController extends BaseController{
         salesSlipService.saveSalesSlip(salesSlip);
         policyNoService.updateById(policyNo);
         policyNoUserService.updateById(policyNoUser);
+        SalesSlipHistory salesSlipHistory = getSalesSlipHistory(salesSlip, 1);
+        salesSlipHistoryService.insert(salesSlipHistory);
         }catch (Exception e) {
             e.printStackTrace();
         }finally {
@@ -264,7 +268,13 @@ public class SalesSlipController extends BaseController{
     public RestResponse edit(@RequestBody SalesSlip salesSlip) {
         User currentUser = getCurrentUser();
         try {
+        SalesSlip editSalesSlip = salesSlipService.selectById(salesSlip.getId());
         Date date = new Date();
+        salesSlip.setPolicyNo(editSalesSlip.getPolicyNo());
+        salesSlip.setNo(editSalesSlip.getNo());
+        salesSlip.setCreateDate(editSalesSlip.getCreateDate());
+        salesSlip.setCreateId(editSalesSlip.getCreateId());
+        salesSlip.setEditCount(editSalesSlip.getEditCount()+1);
         salesSlip.setUpdateId(currentUser.getId());
         salesSlip.setUpdateDate(date);
         salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
@@ -274,7 +284,9 @@ public class SalesSlipController extends BaseController{
             salesSlip.setCertificateType(2);
         }
         salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
+        SalesSlipHistory salesSlipHistory = getSalesSlipHistory(salesSlip,2);
         salesSlipService.updateById(salesSlip);
+        salesSlipHistoryService.insert(salesSlipHistory);
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -417,7 +429,7 @@ public class SalesSlipController extends BaseController{
             summarySalesSlip.setIndex(index);
         }
         try {
-            String[] columnNames = { "序号", "授权网点", " 录入人", "录入总单数"};
+            String[] columnNames = { "序号", "4S店名称", " 录入人", "录入总单数"};
             String fileName = "保单录入汇总表";
             ExportExcelWrapper<SummarySalesSlip> util = new ExportExcelWrapper<SummarySalesSlip>();
             util.exportExcel(fileName, fileName, columnNames, list, response, ExportExcelUtil.EXCEl_FILE_2007);
@@ -470,5 +482,23 @@ public class SalesSlipController extends BaseController{
      */
     public  void unLock(String lockKey){
        redisTemplate.delete(lockKey);
+    }
+    
+    /**
+     * @Description 转换历史保单实体 
+     * type 2修改1新增
+     * @param salesSlip
+     * @return SalesSlipHistory     
+     * @version V1.0
+     * @auth    邹立强   (zoulq@cloud-young.com)
+     * 2019年4月14日 上午11:38:26
+     */
+    private SalesSlipHistory getSalesSlipHistory(SalesSlip salesSlip,Integer type) {
+        SalesSlipHistory salesSlipHistory=new SalesSlipHistory();
+        BeanUtils.copyProperties(salesSlip, salesSlipHistory, "editCount");
+        salesSlipHistory.setId(null);
+        salesSlipHistory.setType(type);
+        salesSlipHistory.setDelFlag(0);
+        return salesSlipHistory;
     }
 }

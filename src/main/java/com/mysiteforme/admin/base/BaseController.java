@@ -11,6 +11,7 @@ import com.mysiteforme.admin.service.PolicyNoService;
 import com.mysiteforme.admin.service.PolicyNoUserService;
 import com.mysiteforme.admin.service.RescourceService;
 import com.mysiteforme.admin.service.RoleService;
+import com.mysiteforme.admin.service.SalesSlipHistoryService;
 import com.mysiteforme.admin.service.SalesSlipService;
 import com.mysiteforme.admin.service.SiteService;
 import com.mysiteforme.admin.service.UploadInfoService;
@@ -56,4 +57,7 @@ public class BaseController {
     	
     	@Autowired
         protected PolicyNoUserService policyNoUserService;
+    	
+    	@Autowired
+        protected SalesSlipHistoryService salesSlipHistoryService;
 }

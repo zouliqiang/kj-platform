@@ -19,7 +19,19 @@
     <div class="layui-field-box">
     <form class="layui-form">
         <div class="layui-inline" style="width: 15%">
-            <input type="text" value="" name="s_key" placeholder="可以输入登录名/邮箱/手机号" class="layui-input search_input">
+            <input type="text" value="" name="s_loginname" placeholder="登录名" class="layui-input search_input">
+        </div>
+         <div class="layui-inline" style="width: 15%">
+            <input type="text" value="" name="s_tel" placeholder="联系方式" class="layui-input search_input">
+        </div>
+          <div class="layui-inline" style="width: 15%">
+            <input type="text" value="" name="s_nickname" placeholder="业务负责人" class="layui-input search_input">
+        </div>
+          <div class="layui-inline" style="width: 15%">
+            <input type="text" value="" name="s_email" placeholder="店内负责人" class="layui-input search_input">
+        </div>
+          <div class="layui-inline" style="width: 15%">
+            <input type="text" value="" name="s_website" placeholder="4S店名称 " class="layui-input search_input">
         </div>
         <div class="layui-inline">
             <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
@@ -76,10 +88,10 @@
             cols: [[
                 {type:'checkbox'},
                 {field:'loginName', title: '登录名称'},
-                {field:'nickName',  title: '昵称',    width:'10%'},
-                {field:'email',     title: '邮箱',    width:'16%' },
+                {field:'nickName',  title: '业务负责人',    width:'10%'},
+                {field:'email',     title: '店内负责人',    width:'16%' },
                 {field:'tel',       title: '电话',    width:'12%'},
-                {field:'website',       title: '站点',    width:'12%'},
+                {field:'website',       title: '4S店名称',    width:'12%'},
                 {field:'locked',    title: '会员状态',width:'12%',templet:'#userStatus'},
                 {field:'createDate',  title: '创建时间',width:'18%',templet:'<div>{{ layui.laytpl.toDateString(d.createDate) }}</div>',unresize: true}, //单元格内容水平居中
                 {fixed: 'right',    width: '15%', align: 'center',toolbar: '#barDemo'}

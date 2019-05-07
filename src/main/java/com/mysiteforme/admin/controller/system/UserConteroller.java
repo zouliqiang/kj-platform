@@ -51,12 +51,28 @@ public class UserConteroller extends BaseController{
         Map map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<User> userLayerData = new LayerData<>();
         EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
-        if(!map.isEmpty()){
-            String keys = (String) map.get("key");
-            if(StringUtils.isNotBlank(keys)) {
-                userEntityWrapper.like("login_name", keys).or().like("tel", keys).or().like("email", keys);
+        
+            String loginname = (String) map.get("loginname");
+            if(StringUtils.isNotBlank(loginname)) {
+                userEntityWrapper.like("login_name", loginname);
             }
-        }
+            String tel = (String) map.get("tel");
+
+            if(StringUtils.isNotBlank(tel)) {
+                userEntityWrapper.eq("tel",tel);
+            }
+            String nickname = (String) map.get("nickname");
+            if(StringUtils.isNotBlank(nickname)) {
+                userEntityWrapper.like("nick_name", nickname);
+            }
+            String email = (String) map.get("email");
+            if(StringUtils.isNotBlank(email)) {
+                userEntityWrapper.like("email", email);
+            }
+            String website = (String) map.get("website");
+            if(StringUtils.isNotBlank(website)) {
+                userEntityWrapper.like("website", website);
+            }
         Page<User> userPage = userService.selectPage(new Page<>(page,limit),userEntityWrapper);
         userLayerData.setCount(userPage.getTotal());
         userLayerData.setData(userPage.getRecords());
@@ -83,11 +99,6 @@ public class UserConteroller extends BaseController{
         }
         if(userService.userCount(user.getLoginName())>0){
             return RestResponse.failure("登录名称已经存在");
-        }
-        if(StringUtils.isNotBlank(user.getEmail())){
-            if(userService.userCount(user.getEmail())>0){
-                return RestResponse.failure("该邮箱已被使用");
-            }
         }
         if(StringUtils.isNoneBlank(user.getTel())){
             if(userService.userCount(user.getTel())>0){
@@ -136,13 +147,6 @@ public class UserConteroller extends BaseController{
             return  RestResponse.failure("用户角色至少选择一个");
         }
         User oldUser = userService.findUserById(user.getId());
-        if(StringUtils.isNotBlank(user.getEmail())){
-            if(!user.getEmail().equals(oldUser.getEmail())){
-                if(userService.userCount(user.getEmail())>0){
-                    return RestResponse.failure("该邮箱已被使用");
-                }
-            }
-        }
         if(StringUtils.isNotBlank(user.getLoginName())){
             if(!user.getLoginName().equals(oldUser.getLoginName())) {
                 if (userService.userCount(user.getLoginName()) > 0) {
@@ -232,13 +236,6 @@ public class UserConteroller extends BaseController{
             return RestResponse.failure("登录名不能为空");
         }
         User oldUser = userService.findUserById(user.getId());
-        if(StringUtils.isNotBlank(user.getEmail())){
-            if(!user.getEmail().equals(oldUser.getEmail())){
-                if(userService.userCount(user.getEmail())>0){
-                    return RestResponse.failure("该邮箱已被使用");
-                }
-            }
-        }
         if(StringUtils.isNotBlank(user.getTel())){
             if(!user.getTel().equals(oldUser.getTel())) {
                 if (userService.userCount(user.getTel()) > 0) {
@@ -282,8 +279,9 @@ public class UserConteroller extends BaseController{
         if(!confirmPwd.equals(newPwd)){
             return RestResponse.failure("确认密码与新密码不一致");
         }
+        User c=getCurrentUser();
         User user = userService.findUserById(MySysUser.id());
-
+        user.setIsSuper(c.getIsSuper());
         //旧密码不能为空
         String pw = ToolUtil.entryptPassword(oldPwd,user.getSalt()).split(",")[0];
         if(!user.getPassword().equals(pw)){

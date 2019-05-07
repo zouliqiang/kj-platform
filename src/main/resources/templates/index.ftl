@@ -78,7 +78,7 @@
                 <li class="layui-nav-item" pc>
                     <a href="javascript:">
                         <img src="<#if (currentUser.icon??)>${currentUser.icon}<#else>${base}/static/images/face.jpg</#if>" class="layui-circle" width="35" height="35">
-                        <cite><#if currentUser.nickName!''>${currentUser.nickName}<#else>${currentUser.loginName}</#if></cite>
+                        <cite><#if currentUser.website!''>${currentUser.website}<#else>${currentUser.loginName}</#if></cite>
                     </a>
                     <dl class="layui-nav-child">
                         <dd><a href="javascript:" data-url="${base}/admin/system/user/userinfo"><i class="iconfont icon-zhanghu" data-icon="icon-zhanghu"></i><cite>个人资料</cite></a></dd>
@@ -94,7 +94,7 @@
     <div class="layui-side layui-bg-black">
         <div class="user-photo">
             <a class="img" title="我的头像" ><img src="<#if (currentUser.icon??)>${currentUser.icon}<#else>${base}/static/images/face.jpg</#if>"></a>
-            <p>你好！<span class="userName"><#if currentUser.nickName!''>${currentUser.nickName}<#else>${currentUser.loginName}</#if></span>, 欢迎登录</p>
+            <p>你好！<span class="userName"><#if currentUser.website!''>${currentUser.website}<#else>${currentUser.loginName}</#if></span>, 欢迎登录</p>
         </div>
         <div class="navBar layui-side-scroll"></div>
     </div>

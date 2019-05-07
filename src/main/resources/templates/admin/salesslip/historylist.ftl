@@ -78,11 +78,6 @@
 </fieldset>
 <div class="layui-form users_list">
     <table class="layui-table" id="test" lay-filter="demo"></table>
-    <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn layui-btn-xs" lay-event="look">查看</a>
-        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="edit">编辑</a>
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="print">打印</a>   
-    </script>
 </div>
 <div id="page"></div>
 <script>
@@ -107,7 +102,7 @@
         });
         t = {
             elem: '#test',
-            url:'${base}/admin/salesslip/list',
+            url:'${base}/admin/salessliphistory/historylist',
             method:'post',
             page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
                 layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
@@ -129,113 +124,13 @@
                 {field:'editCount',    title: '编辑次数'},
                 {field:'name',    title: '录入人'},
                 {field:'createDate',  title: '录入时间',templet:'<div>{{ layui.laytpl.toDateString(d.createDate)}}</div>',unresize: true}, //单元格内容水平居中
-                {fixed: 'right', title: '操作',width: '10%',align: 'center',toolbar: '#barDemo'}
             ]]
         };
         table.render(t);
-
-        //监听工具条
-        table.on('tool(demo)', function(obj){
-        	var data = obj.data;
-            if(obj.event === 'look'){
-                var editIndex = layer.open({
-                    title : "查看保单内容",
-                    type : 2,
-                    content : "${base}/admin/salesslip/look?id="+parseInt(data.id),
-                    success : function(layero, index){
-                        setTimeout(function(){
-                            layer.tips('点击此处返回保单列表', '.layui-layer-setwin .layui-layer-close', {
-                                tips: 3
-                            });
-                        },500);
-                    }
-                });
-                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-                $(window).resize(function(){
-                    layer.full(editIndex);
-                });
-                layer.full(editIndex);
-            }
-            
-            if(obj.event === 'edit'){
-                var editIndex = layer.open({
-                    title : "编辑保单内容",
-                    type : 2,
-                    content : "${base}/admin/salesslip/edit?id="+parseInt(data.id),
-                    success : function(layero, index){
-                        setTimeout(function(){
-                            layer.tips('点击此处返回保单列表', '.layui-layer-setwin .layui-layer-close', {
-                                tips: 3
-                            });
-                        },500);
-                    }
-                });
-                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-                $(window).resize(function(){
-                    layer.full(editIndex);
-                });
-                layer.full(editIndex);
-            }
-            
-            if(obj.event === 'print'){
-                window.open("${base}/admin/salesslip/print?id="+parseInt(data.id));
-            }
-            
-            if(obj.event === "del"){
-                layer.confirm("你确定要删除该日志么？",{btn:['是的,我确定','我再想想']},
-                    function(){
-                        $.post("${base}/admin/system/log/delete",{"ids":[data.id]},function (res){
-                           if(res.success){
-                               layer.msg("删除成功",{time: 1000},function(){
-                                   table.reload('test', t);
-                               });
-                           }else{
-                               layer.msg(res.message);
-                           }
-
-                        });
-                    }
-                )
-            }
-        });
-        var activeExport={
-        		exportSalesSlip : function(){
-        		   	window.location.href="${base}/admin/salesslip/export?s_custometype="+$("#custometype").val()+"&s_no="+$("#no").val()+"&s_customername="+$("#customername").val();
-                }
-            };
-        var activeSummaryExport={
-        		exportSummary : function(){
-        		   	window.location.href="${base}/admin/salesslip/exportSummary";
-                }
-            };
         
-        var activeAdd={
-        		addSalesSlip : function(){
-                    var addIndex = layer.open({
-                        title : "录入保单",
-                        type : 2,
-                        content : "${base}/admin/salesslip/add",
-                        success : function(layero, addIndex){
-                            setTimeout(function(){
-                                layer.tips('点击此处返回保单列表', '.layui-layer-setwin .layui-layer-close', {
-                                    tips: 3
-                                });
-                            },500);
-                        }
-                    });
-                    //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-                    $(window).resize(function(){
-                        layer.full(addIndex);
-                    });
-                    layer.full(addIndex);
-                }
-            };
 
         $('.layui-inline .layui-btn').on('click', function(){
             var type = $(this).data('type');
-            activeAdd[type] ? activeAdd[type].call(this) : '';
-            activeExport[type] ? activeExport[type].call(this) : '';
-            activeSummaryExport[type] ? activeSummaryExport[type].call(this) : '';
         });
 
         //搜索

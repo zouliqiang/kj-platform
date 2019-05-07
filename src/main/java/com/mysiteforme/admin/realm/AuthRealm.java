@@ -82,7 +82,7 @@ public class AuthRealm extends AuthorizingRealm {
         user.setIcon(Constants.WEB_IP+user.getIcon());
         byte[] salt = Encodes.decodeHex(user.getSalt());
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
-                new ShiroUser(user.getId(),user.getLoginName(),user.getNickName(), user.getIcon()),
+                new ShiroUser(user.getId(),user.getLoginName(),user.getNickName(), user.getIcon(),user.getWebsite()),
                 user.getPassword(), //密码
                 ByteSource.Util.bytes(salt),
                 getName()  //realm name
@@ -119,12 +119,14 @@ public class AuthRealm extends AuthorizingRealm {
         public String loginName;
         public String nickName;
         public String icon;
+        public String website;
 
-        public ShiroUser(Long id, String loginName, String nickName,String icon) {
+        public ShiroUser(Long id, String loginName, String nickName,String icon,String website) {
             this.id = id;
             this.loginName = loginName;
             this.nickName = nickName;
             this.icon=icon;
+            this.website=website;
         }
 
         public String getloginName() {

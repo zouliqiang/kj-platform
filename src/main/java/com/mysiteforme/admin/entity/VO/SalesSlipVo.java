@@ -10,6 +10,8 @@ public class SalesSlipVo extends SalesSlip{
      * 录入者姓名
      */
     private String name;
+    
+    private String website;
 
     public String getName() {
         return name;
@@ -18,7 +20,13 @@ public class SalesSlipVo extends SalesSlip{
     public void setName(String name) {
         this.name = name;
     }
-    
-    
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
    
 }

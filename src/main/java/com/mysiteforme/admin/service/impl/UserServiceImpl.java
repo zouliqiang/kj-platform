@@ -44,7 +44,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 	}
 
 
-	@Cacheable(value = "user",key="'user_id_'+T(String).valueOf(#id)",unless = "#result == null")
+	//@Cacheable(value = "user",key="'user_id_'+T(String).valueOf(#id)",unless = "#result == null")
 	@Override
 	public User findUserById(Long id) {
 		// TODO Auto-generated method stub

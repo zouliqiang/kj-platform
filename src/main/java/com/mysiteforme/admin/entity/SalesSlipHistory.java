@@ -13,8 +13,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author 邹立强   (zoulq@cloud-young.com)
  * <p>Copyright (c) Department of Research and Development/Beijing.</p>
  */
-@TableName("sales_slip")
-public class SalesSlip implements java.io.Serializable {
+@TableName("sales_slip_history")
+public class SalesSlipHistory implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
     
@@ -162,11 +162,6 @@ public class SalesSlip implements java.io.Serializable {
     @TableField("first_beneficiary")
     private String firstBeneficiary;
     
-    /**
-     * 编辑次数
-     */
-    @TableField("edit_count")
-    private Integer editCount=0;
 
     /**
      * 登记时间
@@ -196,7 +191,13 @@ public class SalesSlip implements java.io.Serializable {
      * 0未删除1已删除
      */
     @TableField("del_flag")
-    private Integer delFlag;
+    private Integer delFlag=0;
+    
+    /**
+     * 1新增2修改
+     */
+    @TableField("type")
+    private Integer type;
     
     public Long getId() {
         return id;
@@ -437,11 +438,11 @@ public class SalesSlip implements java.io.Serializable {
         this.updateId = updateId;
     }
 
-    public Integer getEditCount() {
-        return editCount;
+    public Integer getType() {
+        return type;
     }
 
-    public void setEditCount(Integer editCount) {
-        this.editCount = editCount;
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

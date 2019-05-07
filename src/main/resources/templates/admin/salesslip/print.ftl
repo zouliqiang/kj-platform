@@ -21,6 +21,8 @@
 <div class="layui-btn-group" style="position: absolute;">
 		<button class="layui-btn layui-btn-danger layui-btn-radius"
 			id="printBtn">打印</button>
+		<button class="layui-btn layui-btn-warning layui-btn-radius"
+		id="btnSave">下载图片</button>
 </div>
 <body class="childrenBody">
 	<div class="container"  id="printDiv">
@@ -33,7 +35,7 @@
 			</div>
 			<div class="title"><img src="${base}/static/images/renshou.png">
 			<br>
-			全车盗抢综合保险客户服务单</div><br><br><br>
+			全车盗抢综合保险客户服务单<span style="font-size:18px">（电子保单）</span></div><br><br><br>
 			<div class="guaranteeNum">
 				<span> 保单号： </span> <span>${salesSlip.policyNo}</span>
 			</div>
@@ -296,16 +298,30 @@
    font-weight: bold;
 }
 .nameTdC{
-width: 100px !important;
+width: 180px !important;
 }
 .nameTdD{
 width: 300px !important;
+}
+.nameTd{
+width: 150px !important;
+}
+td, th {
+    text-align:center;
+    vertical-align:middle;
+    display: table-cell;
 }
 </style>
 	<script type="text/javascript"
 		src="${base}/static/js/jquery-1.4.4.min.js"></script>
 	<script type="text/javascript"
 		src="${base}/static/js/jquery.jqprint-0.3.js"></script>
+			<script type="text/javascript"
+		src="${base}/static/js/html5shiv.js"></script>
+			<script type="text/javascript"
+		src="${base}/static/js/bluebird.js"></script>
+			<script type="text/javascript"
+		src="${base}/static/js/html2canvas.js"></script>
 
 	<script>
 		$(function() {
@@ -313,6 +329,75 @@ width: 300px !important;
 				$("#printDiv").jqprint();
 			})
 		})
+		
+		/*生成canvas图形*/
+ 
+	// 获取按钮id
+	var btnSave = document.getElementById("btnSave");
+	// 获取内容id
+	var content = document.getElementById("printDiv");
+	// 进行canvas生成
+ 
+	btnSave.onclick = function () {
+ 
+		html2canvas(content, { useCORS: true, scale: 2 }).then(function (canvas) {
+			var dataUrl = canvas.toDataURL('image/jpeg', 1.0) //image/jpeg 保存文件类型，图片的格式    0-1，表示生成的图片的质量，取值0到1，
+ 
+			$("#images").attr("src", dataUrl);
+			saveFile(dataUrl, '全车盗抢综合保险客户服务单');
+		});
+	}
+	// // 保存文件函数
+	var saveFile = function (data, filename) {
+		if (myBrowser() == "IE") {   // if browser is IE
+			function dataURLtoBlob(dataurl) {
+				var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+					bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+				while (n--) {
+					u8arr[n] = bstr.charCodeAt(n);
+				}
+				return new Blob([u8arr], { type: mime });
+			}
+			var blob_ = dataURLtoBlob(data); // 用到Blob是因为图片文件过大时，在一部风浏览器上会下载失败，而Blob就不会
+			var url;
+			url = {
+				name: filename, // 图片名称不需要加.png后缀名
+				src: blob_
+			};
+			navigator.msSaveBlob(url.src, url.name + '.png');//filename文件名包括扩展名，下载路径为浏览器默认路径
+		} else {
+			var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+			save_link.href = data;
+			save_link.download = filename;
+			var event = document.createEvent('MouseEvents');
+			event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			save_link.dispatchEvent(event);
+		}
+	};
+ 
+ 
+	function myBrowser() {
+		var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+		var isOpera = userAgent.indexOf("Opera") > -1;
+		if (isOpera) {
+			return "Opera"
+		}; //判断是否Opera浏览器
+		if (userAgent.indexOf("Firefox") > -1) {
+			return "FF";
+		} //判断是否Firefox浏览器
+		if (userAgent.indexOf("Chrome") > -1) {
+			return "Chrome";
+		}
+		if (userAgent.indexOf("Safari") > -1) {
+			return "Safari";
+		} //判断是否Safari浏览器
+		if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera) {
+			return "IE";
+		}; //判断是否IE浏览器
+		if (userAgent.indexOf("Trident") > -1) {
+			return "Edge";
+		} //判断是否Edge浏览器
+	}
 	</script>
 	</div>
 </body>

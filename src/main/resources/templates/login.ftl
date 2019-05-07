@@ -46,10 +46,10 @@
                 form = layui.form;
 
         $(document).ready(function() {
-            var srcBgArray = ["https://static.mysiteforme.com/chun.jpg",
-                "https://static.mysiteforme.com/xia.jpg",
-                "https://static.mysiteforme.com/qiu.jpg",
-                "https://static.mysiteforme.com/dong.jpg"];
+            var srcBgArray = ["http://39.98.205.174/images/head/1.jpg",
+                "http://39.98.205.174/images/head/2.jpg",
+                "http://39.98.205.174/images/head/3.jpg",
+                "http://39.98.205.174/images/head/4.jpg"];
             $('#bg-body').bcatBGSwitcher({
                 timeout:5000,
                 urls: srcBgArray,

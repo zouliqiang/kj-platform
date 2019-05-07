@@ -41,15 +41,15 @@
     </div>
     <div class="layui-form-item">
         <div class="layui-inline">
-            <label class="layui-form-label">昵称</label>
+            <label class="layui-form-label">业务负责人</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input" name="nickName" placeholder="请输入昵称">
+                <input type="text" class="layui-input" name="nickName" placeholder="业务负责人">
             </div>
         </div>
         <div class="layui-inline">
-            <label class="layui-form-label">邮箱</label>
+            <label class="layui-form-label">店内负责人</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input" name="email" lay-verify="email" placeholder="请输入邮箱">
+                <input type="text" class="layui-input" name="email"  placeholder="店内负责人">
             </div>
         </div>
         <div class="layui-inline">
@@ -79,9 +79,9 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">站点</label>
+        <label class="layui-form-label">4S店名称</label>
         <div class="layui-input-block">
-            <input type="text" class="layui-input" name="website" lay-verify="required" placeholder="请输入站点">
+            <input type="text" class="layui-input" name="website" lay-verify="required" placeholder="请输入4S店名称">
         </div>
     </div>
     <div class="layui-form-item">

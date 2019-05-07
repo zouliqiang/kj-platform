@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">昵称</label>
+            <label class="layui-form-label">业务负责人</label>
             <div class="layui-input-block">
                 <input type="text" value="${userinfo.nickName}" name="nickName" class="layui-input">
             </div>
@@ -44,9 +44,9 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">邮箱</label>
+            <label class="layui-form-label">店内负责人</label>
             <div class="layui-input-block">
-                <input type="text" value="${userinfo.email}" name="email" placeholder="请输入邮箱" lay-verify="email" class="layui-input userEmail">
+                <input type="text" value="${userinfo.email}" name="email" placeholder="请输入店内负责人"  class="layui-input userEmail">
             </div>
         </div>
         <div class="layui-form-item">
