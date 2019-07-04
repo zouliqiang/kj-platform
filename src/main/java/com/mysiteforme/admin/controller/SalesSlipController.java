@@ -102,7 +102,7 @@ public class SalesSlipController extends BaseController{
             }
             String website = (String) map.get("website");
             if (StringUtils.isNotBlank(website)) {
-                paramMap.put("website", "%" + certificateNo + "%");
+                paramMap.put("website", "%" + website + "%");
             }
             String insuranceRange = (String) map.get("insurance_range");
             if (StringUtils.isNotBlank(insuranceRange)) {
