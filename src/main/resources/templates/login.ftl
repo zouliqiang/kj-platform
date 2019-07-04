@@ -15,6 +15,8 @@
 </head>
 <body>
 <div id="bg-body"></div>
+<div class="prev"><h1><a href="http://ys.haodevps.cn" target="_blank">上汽财务专用端口</a></h1>
+</div>
 <div class="login">
     <h1>酷嘉服务平台</h1>
     <form class="layui-form" action="${base}/login/main" method="post">

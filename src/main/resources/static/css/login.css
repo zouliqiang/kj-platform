@@ -10,3 +10,6 @@ body{overflow:hidden;}
 .form_code{ position:relative; }
 .form_code .code{ position:absolute; right:0; top:1px; cursor:pointer; }
 .login_btn{ width:100%; }
+.prev{ height:300px;width:260px;padding: 20px;border-radius: 4px;position:absolute;left: 80%;top: 2%; z-index:99;}
+.prev h1 { cursor:pointer;text-align:center; color:#fff; font-size:20px;background:#68838B; margin-bottom:20px; }
+.prev h1 a{color:#fff;}
