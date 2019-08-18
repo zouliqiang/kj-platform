@@ -69,8 +69,13 @@ public class User extends DataEntity<User> {
      * 是否是超级管理员
      */
     @TableField(value = "is_super", strategy = FieldStrategy.IGNORED)
-    private Boolean isSuper=false;
+    private Boolean isSuper = false;
+
+    @TableField(value = "child_ids", strategy = FieldStrategy.IGNORED)
+    private String childIds;
     
+    @TableField(exist = false)
+    private String level;
     /**
      * 站点
      */
@@ -183,5 +188,20 @@ public class User extends DataEntity<User> {
     public void setWebsite(String website) {
         this.website = website;
     }
-    
-}
+
+    public String getChildIds() {
+        return childIds;
+    }
+
+    public void setChildIds(String childIds) {
+        this.childIds = childIds;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+  }

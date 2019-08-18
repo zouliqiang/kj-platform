@@ -76,7 +76,7 @@
    <div class="layui-form-item">
         <label class="layui-form-label">4S店名称</label>
         <div class="layui-input-block">
-            <input type="text" class="layui-input" name="website" lay-verify="required" value="${localuser.website}" placeholder="请输入站点">
+            <input type="text" class="layui-input" name="website" lay-verify="required" value="${localuser.website}" placeholder="请输入4S店名称">
         </div>
     </div>
     <div class="layui-form-item">

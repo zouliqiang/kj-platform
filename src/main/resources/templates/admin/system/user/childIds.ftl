@@ -15,7 +15,7 @@
 </head>
 <body class="childrenBody">
 <fieldset class="layui-elem-field">
-    <legend>用户检索</legend>
+    <legend>为【${user.loginName}】添加子账户</legend>
     <div class="layui-field-box">
     <form class="layui-form">
         <div class="layui-inline" style="width: 15%">
@@ -36,30 +36,41 @@
         <div class="layui-inline">
             <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
         </div>
-        <div class="layui-inline">
-            <a class="layui-btn layui-btn-normal" data-type="addUser">添加用户</a>
-        </div>
-        <div class="layui-inline">
-            <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
-        </div>
     </form>
     </div>
 </fieldset>
 <div class="layui-form users_list">
     <table class="layui-table" id="test" lay-filter="demo"></table>
-
-    <script type="text/html" id="userStatus">
+     <script type="text/html" id="childIdsTemplate">
         <!-- 这里的 checked 的状态只是演示 -->
-        {{#  if(d.delFlag == false){ }}
-        <span class="layui-badge layui-bg-green">正常</span>
+        {{# 
+        var childIdStr="${user.childIds}";
+       if( childIdStr == undefined || childIdStr== ""){ }}
+           <span class="layui-badge layui-bg-green">否</span>
         {{#  } else { }}
-        <span class="layui-badge layui-bg-gray">停用</span>
+       {{#  var id=d.id.toString();
+            var childIdsArray=childIdStr.split(",");
+        if(childIdsArray==undefined || childIdsArray.indexOf(id) == -1){ }}
+        <span class="layui-badge layui-bg-red">否</span>
+        {{#  } else { }}
+        <span class="layui-badge layui-bg-green">是</span>
+        {{#  } }}
         {{#  } }}
     </script>
     <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="setChild">设置子账户</a>
+{{# 
+        var childIdStr="${user.childIds}";
+       if( childIdStr == undefined || childIdStr== ""){ }}
+        <a class="layui-btn layui-btn layui-btn-xs" lay-event="addAccount">添加</a>
+        {{#  } else { }}
+       {{#  var id=d.id.toString();
+            var childIdsArray=childIdStr.split(",");
+        if(childIdsArray==undefined || childIdsArray.indexOf(id) == -1){ }}
+        <a class="layui-btn layui-btn layui-btn-xs" lay-event="addAccount">添加</a>
+        {{#  } else { }}
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="cancelAddAccount">取消添加</a>
+        {{#  } }}
+        {{#  } }}
     </script>
 </div>
 <div id="page"></div>
@@ -72,10 +83,10 @@
                 form = layui.form,
                 table = layui.table,
                 t;                  //表格数据变量
-
+        var userId="${user.id}";
         t = {
             elem: '#test',
-            url:'${base}/admin/system/user/list',
+            url:'${base}/admin/system/user/list?userId='+userId,
             method:'post',
             page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
                 layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
@@ -91,11 +102,9 @@
                 {field:'loginName', title: '登录名称'},
                 {field:'nickName',  title: '业务负责人',    width:'10%'},
                 {field:'email',     title: '店内负责人',    width:'16%' },
-                {field:'tel',       title: '电话',    width:'10%'},
+                {field:'tel',       title: '电话',    width:'12%'},
                 {field:'website',       title: '4S店名称',    width:'12%'},
-                {field:'level',    title: '用户级别',width:'8%'},
-                {field:'locked',    title: '会员状态',width:'12%',templet:'#userStatus'},
-                {field:'createDate',  title: '创建时间',width:'18%',templet:'<div>{{ layui.laytpl.toDateString(d.createDate) }}</div>',unresize: true}, //单元格内容水平居中
+                {field:'childIds',    title: '是否是子账户',width:'12%',templet:'#childIdsTemplate'},
                 {fixed: 'right',    width: '15%', align: 'center',toolbar: '#barDemo'}
             ]]
         };
@@ -104,32 +113,17 @@
         //监听工具条
         table.on('tool(demo)', function(obj){
             var data = obj.data;
-            if(obj.event === 'edit'){
-                var editIndex = layer.open({
-                    title : "编辑用户",
-                    type : 2,
-                    content : "${base}/admin/system/user/edit?id="+data.id,
-                    success : function(layero, index){
-                        setTimeout(function(){
-                            layer.tips('点击此处返回会员列表', '.layui-layer-setwin .layui-layer-close', {
-                                tips: 3
-                            });
-                        },500);
-                    }
-                });
-                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-                $(window).resize(function(){
-                    layer.full(editIndex);
-                });
-                layer.full(editIndex);
-            }
-            if(obj.event === "del"){
-                layer.confirm("你确定要删除该用户么？",{btn:['是的,我确定','我再想想']},
+            var loginName="${user.loginName}";
+            var userId="${user.id}";
+            var childLoginName=data.loginName;
+            if(obj.event === "addAccount"){
+                layer.confirm("你确定要将【"+childLoginName+"】添加为【"+loginName+"】的子账户",{btn:['是的,我确定','我再想想']},
                     function(){
-                        $.post("${base}/admin/system/user/delete",{"id":data.id},function (res){
+                        $.post("${base}/admin/system/user/addChildAccount",{"id":data.id,"userId":userId},function (res){
                            if(res.success){
-                               layer.msg("删除成功",{time: 1000},function(){
-                                   table.reload('test', t);
+                               layer.msg("添加成功",{time: 1000},function(){
+                            	   window.location.href="${base}/admin/system/user/setChildList?id="+userId;
+                            	   //table.reload('test', t);
                                });
                            }else{
                                layer.msg(res.message);
@@ -139,24 +133,22 @@
                     }
                 )
             }
-            if(obj.event === "setChild"){
-            	var addIndex = layer.open({
-                    title : "设置子账户",
-                    type : 2,
-                    content : "${base}/admin/system/user/setChildList?id="+data.id,
-                    success : function(layero, addIndex){
-                        setTimeout(function(){
-                            layer.tips('点击此处返回系统用户管理', '.layui-layer-setwin .layui-layer-close', {
-                                tips: 3
-                            });
-                        },500);
+            if(obj.event === "cancelAddAccount"){
+                layer.confirm("你确定要将【"+childLoginName+"】从【"+loginName+"】的子账户中取消",{btn:['是的,我确定','我再想想']},
+                    function(){
+                        $.post("${base}/admin/system/user/cancelAddChildAccount",{"id":data.id,"userId":userId},function (res){
+                           if(res.success){
+                               layer.msg("取消成功",{time: 1000},function(){
+                            	   window.location.href="${base}/admin/system/user/setChildList?id="+userId;
+                                   //table.reload('test', t);
+                               });
+                           }else{
+                               layer.msg(res.message);
+                           }
+
+                        });
                     }
-                });
-                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-                $(window).resize(function(){
-                    layer.full(addIndex);
-                });
-                layer.full(addIndex); 	
+                )
             }
         });
 
@@ -219,7 +211,6 @@
                     layer.msg("请选择需要删除的用户",{time:1000});
                 }
             }
-    		
         };
 
         $('.layui-inline .layui-btn').on('click', function(){

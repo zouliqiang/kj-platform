@@ -15,7 +15,7 @@
 </head>
 <body>
 <div id="bg-body"></div>
-<div class="prev"><h1><a href="http://ys.haodevps.cn" target="_blank">上汽财务专用端口</a></h1>
+<div class="prev"><h1><a href="https://figps.com" target="_blank">丰田金融专用端口</a></h1>
 </div>
 <div class="login">
     <h1>酷嘉服务平台</h1>

@@ -1,5 +1,28 @@
 package com.mysiteforme.admin.controller.system;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.WebUtils;
+
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.google.common.collect.Lists;
@@ -13,19 +36,6 @@ import com.mysiteforme.admin.util.Constants;
 import com.mysiteforme.admin.util.LayerData;
 import com.mysiteforme.admin.util.RestResponse;
 import com.mysiteforme.admin.util.ToolUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
-
-import javax.servlet.ServletRequest;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by wangl on 2017/11/21.
@@ -47,11 +57,11 @@ public class UserConteroller extends BaseController{
     @ResponseBody
     public LayerData<User> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
                                 @RequestParam(value = "limit",defaultValue = "10")Integer limit,
-                                ServletRequest request){
+                                HttpServletRequest request){
         Map map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<User> userLayerData = new LayerData<>();
         EntityWrapper<User> userEntityWrapper = new EntityWrapper<>();
-        
+            String userId = request.getParameter("userId");
             String loginname = (String) map.get("loginname");
             if(StringUtils.isNotBlank(loginname)) {
                 userEntityWrapper.like("login_name", loginname);
@@ -60,6 +70,10 @@ public class UserConteroller extends BaseController{
 
             if(StringUtils.isNotBlank(tel)) {
                 userEntityWrapper.eq("tel",tel);
+            }
+            if(StringUtils.isNotBlank(userId)) {
+                userEntityWrapper.ne("id",Long.valueOf(userId));
+                userEntityWrapper.eq("is_super",0);
             }
             String nickname = (String) map.get("nickname");
             if(StringUtils.isNotBlank(nickname)) {
@@ -74,6 +88,20 @@ public class UserConteroller extends BaseController{
                 userEntityWrapper.like("website", website);
             }
         Page<User> userPage = userService.selectPage(new Page<>(page,limit),userEntityWrapper);
+        List<User> records = userPage.getRecords();
+        for (User user : records) {
+            Boolean isSuper = user.getIsSuper();
+            if(isSuper) {
+                user.setLevel("一级");
+            }else {
+                String childIds = user.getChildIds();
+                if(StringUtils.isNotBlank(childIds)) {
+                    user.setLevel("二级");
+                }else {
+                    user.setLevel("三级");
+                }
+            }
+        }
         userLayerData.setCount(userPage.getTotal());
         userLayerData.setData(userPage.getRecords());
         return  userLayerData;
@@ -112,7 +140,76 @@ public class UserConteroller extends BaseController{
         }
         return RestResponse.success();
     }
+    @RequiresPermissions("sys:user:addChildAccount")
+    @PostMapping("addChildAccount")
+    @ResponseBody
+    @SysLog("设置子账户")
+    public RestResponse addChildAccount(HttpServletRequest request){
+        String userId = request.getParameter("userId");
+        String id = request.getParameter("id");
+        if(StringUtils.isBlank(userId)){
+            return RestResponse.failure("绑定用户Id不能为空");
+        }
+        if(StringUtils.isBlank(id)){
+            return  RestResponse.failure("绑定子账户不能为空");
+        }
+        User user = userService.findUserById(Long.valueOf(userId));
+        String childIds = user.getChildIds();
+        if(StringUtils.isNotBlank(childIds)) {
+            String[] split = childIds.split(",");
+            List<String> asList = Arrays.asList(split);
+            List<String> list =new ArrayList<String>(asList);
+            list.add(id);
+            Set<String> staffsSet = new HashSet<>(list);
+            StringBuffer sb =new StringBuffer();
+            for (String idSet:staffsSet) {
+                sb.append(idSet).append(",");
+            }
+            childIds = sb.substring(0, sb.length()-1);
+            user.setChildIds(childIds);
+        }else {
+            user.setChildIds(id);
+        }
+        userService.updateUser(user);
+        return RestResponse.success();
+    }
+    
+    @RequiresPermissions("sys:user:cancelAddChildAccount")
+    @PostMapping("cancelAddChildAccount")
+    @ResponseBody
+    @SysLog("取消设置子账户")
+    public RestResponse cancelAddChildAccount(HttpServletRequest request){
+        String userId = request.getParameter("userId");
+        String id = request.getParameter("id");
+        if(StringUtils.isBlank(userId)){
+            return RestResponse.failure("绑定用户Id不能为空");
+        }
+        if(StringUtils.isBlank(id)){
+            return  RestResponse.failure("绑定子账户不能为空");
+        }
+        User user = userService.findUserById(Long.valueOf(userId));
+        String childIds = user.getChildIds();
+        if(StringUtils.isNotBlank(childIds)) {
+            String[] split = childIds.split(",");
+            List<String> asList = Arrays.asList(split);
+            Set<String> staffsSet = new HashSet<>(asList);
+            staffsSet.remove(id);
+            StringBuffer sb =new StringBuffer();
+            if(staffsSet.size()>0) {
+            for (String idSet:staffsSet) {
+                sb.append(idSet).append(",");
+            }
+            childIds = sb.substring(0, sb.length()-1);
+            user.setChildIds(childIds);
+            }else {
+                user.setChildIds("");
+            }
+        }
+        userService.updateUser(user);
+        return RestResponse.success();
+    }
 
+    
     @GetMapping("edit")
     public String edit(Long id,Model model){
         User user = userService.selectById(id);
@@ -259,6 +356,15 @@ public class UserConteroller extends BaseController{
     public String changePassword(){
         return "admin/system/user/changePassword";
     }
+    
+    @GetMapping("setChildList")
+    public String setChildList(HttpServletRequest request){
+        String userId = request.getParameter("id");
+        User user = userService.findUserById(Long.valueOf(userId));
+        request.setAttribute("user", user);
+        return "admin/system/user/childIds";
+    }
+  
 
     @RequiresPermissions("sys:user:changePassword")
     @PostMapping("changePassword")

@@ -9,6 +9,7 @@
         <result property="tel" column="tel"/>
         <result property="email" column="email"/>
         <result property="website" column="website"/>
+        <result property="childIds" column="child_ids"/>
         <result property="password"  column="password"/>
         <result property="salt"  column="salt"/>
         <result property="locked" column="locked"/>
@@ -42,6 +43,8 @@
         u.locked,
         u.del_flag,
         u.website,
+        u.is_super,
+        u.child_ids,
         u.icon,
         r.id     		AS 	"role.id",
         r.name			AS	"role.name",

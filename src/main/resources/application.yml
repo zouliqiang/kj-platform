@@ -106,7 +106,7 @@ spring:
         min-idle: 5       # 连接池中的最小空闲连接
   # 数据源配置
   datasource:
-    url: jdbc:mysql://node-1:3306/mysiteforme?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    url: jdbc:mysql://node-1:3306/kj-platform?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
     username: root
     password: Zlq7816523
 
