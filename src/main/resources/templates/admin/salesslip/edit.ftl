@@ -161,7 +161,7 @@
      <div class="layui-inline">
         <label class="layui-form-label">第一受益人</label>
         <div class="layui-input-block">
-            <input  type="text"  class="layui-input" name="firstBeneficiary" maxlength="50" value="${salesSlip.firstBeneficiary}"  lay-verify="required">
+            <input  type="text"  class="layui-input" name="firstBeneficiary" maxlength="200" value="${salesSlip.firstBeneficiary}"  lay-verify="required">
         </div>
     </div>
     </div>

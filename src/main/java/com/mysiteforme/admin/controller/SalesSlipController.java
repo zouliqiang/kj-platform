@@ -368,8 +368,22 @@ public class SalesSlipController extends BaseController{
             }
         }
         User currentUser = getCurrentUser();
+        String childIds = currentUser.getChildIds();
+        if(StringUtils.isNotBlank(childIds)) {
+            childIds=childIds+","+currentUser.getId();
+        }else {
+            childIds=currentUser.getId().toString();
+        }
+
         if (!currentUser.getIsSuper()) {
-            paramMap.put("create_by", currentUser.getId());
+            List<String> asList = Arrays.asList(StringUtils.split(childIds, ","));
+            List<Long> longList=new ArrayList<Long>();
+            for(String str:asList) {
+                longList.add(Long.valueOf(str));
+            }
+            paramMap.put("create_by",longList);
+        }else {
+            paramMap.put("create_by",new ArrayList<Long>());
         }
         List<SalesSlipVo> list = salesSlipService.getListSalesSlip(paramMap);
         List<SalesSlipExport> result=new ArrayList<SalesSlipExport>();

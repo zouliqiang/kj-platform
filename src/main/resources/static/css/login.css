@@ -13,3 +13,6 @@ body{overflow:hidden;}
 .prev{ height:300px;width:260px;padding: 20px;border-radius: 4px;position:absolute;left: 80%;top: 2%; z-index:99;}
 .prev h1 { cursor:pointer;text-align:center; color:#fff; font-size:20px;background:#68838B; margin-bottom:20px; }
 .prev h1 a{color:#fff;}
+.prev2{ height:300px;width:260px;padding: 20px;border-radius: 4px;position:absolute;left: 65%;top: 2%; z-index:99;}
+.prev2 h1 { cursor:pointer;text-align:center; color:#fff; font-size:20px;background:#68838B; margin-bottom:20px; }
+.prev2 h1 a{color:#fff;}

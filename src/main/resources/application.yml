@@ -95,9 +95,9 @@ spring:
   #redis配置
   redis:
       database: 1
-      host: node-1
+      host: 10.6.64.33
       port: 6379
-      password: 7816523     # 密码（默认为空）
+      password:      # 密码（默认为空）
       timeout: 6000  # 连接超时时长（毫秒）
       pool:
         max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
@@ -106,9 +106,9 @@ spring:
         min-idle: 5       # 连接池中的最小空闲连接
   # 数据源配置
   datasource:
-    url: jdbc:mysql://node-1:3306/kj-platform?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
-    username: root
-    password: Zlq7816523
+    url: jdbc:mysql://192.168.99.63:3306/zlq_test?useUnicode=true&characterEncoding=utf8&useSSL=false&tinyInt1isBit=true
+    username: biyaodev
+    password: biyao
 
 #日志
 logging:
