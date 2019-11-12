@@ -184,6 +184,9 @@ public class SalesSlipController extends BaseController{
         salesSlip.setCreateId(currentUser.getId());
         salesSlip.setCreateDate(date);
         salesSlip.setDelFlag(0);
+        if(salesSlip.getServiceCharge()==null) {
+        	salesSlip.setServiceCharge(0);
+        }
         salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
         Map<String,Object> map=new HashMap<String,Object>();
         map.put("userId", currentUser.getId());
@@ -300,6 +303,9 @@ public class SalesSlipController extends BaseController{
         }
         salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
         SalesSlipHistory salesSlipHistory = getSalesSlipHistory(salesSlip,2);
+        if(salesSlip.getServiceCharge()==null) {
+        	salesSlip.setServiceCharge(0);
+        }
         salesSlipService.updateById(salesSlip);
         salesSlipHistoryService.insert(salesSlipHistory);
         }catch (Exception e) {

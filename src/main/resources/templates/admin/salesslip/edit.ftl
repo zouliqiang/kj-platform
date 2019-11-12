@@ -157,7 +157,7 @@
         <div class="layui-input-block">
             <input  type="text"  class="layui-input" name="compensatePrice" maxlength="20" value="${salesSlip.compensatePrice}"  lay-verify="required|number">
         </div>
-    </div>
+       </div>
      <div class="layui-inline">
         <label class="layui-form-label">第一受益人</label>
         <div class="layui-input-block">
@@ -165,6 +165,25 @@
         </div>
     </div>
     </div>
+    <div class="layui-form-item">
+    <#if salesSlip.serviceCharge?exists && salesSlip.serviceCharge==0>
+        <div class="layui-inline">
+        <label class="layui-form-label">盗抢服务系统收费（元）</label>
+        <div class="layui-input-block">
+            <input  type="text"  class="layui-input" name="serviceCharge" maxlength="20" value="" lay-verify="number">
+        </div>
+    </div>
+     </#if>
+        <#if !salesSlip.serviceCharge?exists || salesSlip.serviceCharge!=0>
+        <div class="layui-inline">
+        <label class="layui-form-label">盗抢服务系统收费（元）</label>
+        <div class="layui-input-block">
+            <input  type="text"  class="layui-input" name="serviceCharge" maxlength="20" value="${salesSlip.serviceCharge}" lay-verify="number">
+        </div>
+    </div>
+     </#if>
+    </div>
+     </div>
         <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn" lay-submit="" lay-filter="editSalesSlip">保存</button>

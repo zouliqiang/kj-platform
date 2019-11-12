@@ -75,18 +75,26 @@
 						<td class="nameTd">初始购车价</td>
 						<td class="nameTdD">${salesSlip.vehiclePrice}</td>
 					</tr>
+					<#if salesSlip.serviceCharge?exists && salesSlip.serviceCharge!=0>
 					<tr>
 						<td class="nameTd">安装日期</td>
 						<td class="nameTdC">${(salesSlip.installDate?string("yyyy-MM-dd"))!}</td>
 						<td class="nameTd">安装地点</td>
 						<td class="nameTdD">${salesSlip.installAddress}</td>
 					</tr>
+					</#if>
 					<tr>
 						<td class="nameTd">安装人</td>
 						<td class="nameTdC">${salesSlip.installser}</td>
 						<td class="nameTd">产品SN 码</td>
 						<td class="nameTdD">${salesSlip.productNo}</td>
 					</tr>
+					<#if salesSlip.serviceCharge?exists && salesSlip.serviceCharge!=0>
+					<tr>
+						<td class="nameTd">盗抢服务系统收费</td>
+						<td class="nameTdC">${salesSlip.serviceCharge}元</td>
+					</tr>
+					</#if>
 				</table>
 			</div>
 			<div class="detail-content">
@@ -249,10 +257,10 @@
 }
 
 .detail-content .detail {
-	padding: 3px 10px 5px;
+	padding: 2px 10px 5px;
 	font-size: 13px;
 	border-top: 1px solid #000;
-	line-height: 18px;
+	line-height: 16px;
 	box-sizing: border-box;
 }
 

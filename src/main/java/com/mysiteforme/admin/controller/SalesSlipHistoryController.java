@@ -1,46 +1,22 @@
 package com.mysiteforme.admin.controller;
 
 
-import java.util.ArrayList;
-import java.util.Date;
+import com.mysiteforme.admin.base.BaseController;
+import com.mysiteforme.admin.entity.User;
+import com.mysiteforme.admin.entity.VO.SalesSlipVo;
+import com.mysiteforme.admin.util.LayerData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
-
-import com.mysiteforme.admin.annotation.SysLog;
-import com.mysiteforme.admin.base.BaseController;
-import com.mysiteforme.admin.entity.PolicyNo;
-import com.mysiteforme.admin.entity.PolicyNoUser;
-import com.mysiteforme.admin.entity.SalesSlip;
-import com.mysiteforme.admin.entity.SalesSlipExport;
-import com.mysiteforme.admin.entity.SalesSlipHistory;
-import com.mysiteforme.admin.entity.User;
-import com.mysiteforme.admin.entity.VO.SalesSlipVo;
-import com.mysiteforme.admin.entity.VO.SummarySalesSlip;
-import com.mysiteforme.admin.util.DateUtil;
-import com.mysiteforme.admin.util.LayerData;
-import com.mysiteforme.admin.util.RestResponse;
-import com.mysiteforme.admin.util.poi.ExportExcelUtil;
-import com.mysiteforme.admin.util.poi.ExportExcelWrapper;
 
 /**
  * @Description 保单控制

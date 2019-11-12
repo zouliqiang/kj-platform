@@ -167,7 +167,14 @@
         </div>
     </div>
     </div>
-      
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">盗抢服务系统收费（元）</label>
+        <div class="layui-input-block">
+            <input  type="text"  class="layui-input" name="serviceCharge" maxlength="20" lay-verify="number"  placeholder="请输入盗抢服务系统收费">
+        </div>
+    </div>
+    </div>
     <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn" lay-submit="" lay-filter="addSalesSlip">保存</button>

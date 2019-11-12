@@ -159,8 +159,16 @@
    <div class="layui-form-item">
         <label class="layui-form-label">第一受益人</label>
         <div class="layui-input-block">
-            <input  type="text"  class="layui-input" name="firstBeneficiary" maxlength="50" value="${salesSlip.firstBeneficiary}" readonly="readonly"  lay-verify="required">
+            <input  type="text"  class="layui-input" name="firstBeneficiary" maxlength="200" value="${salesSlip.firstBeneficiary}" readonly="readonly"  lay-verify="required">
         </div>
+         <#if salesSlip.serviceCharge?exists && salesSlip.serviceCharge!=0>
+        <div class="layui-inline">
+        <label class="layui-form-label">盗抢服务系统收费（元）</label>
+        <div class="layui-input-block">
+            <input  type="text"  class="layui-input" name="serviceCharge" maxlength="20" value="${salesSlip.serviceCharge}" lay-verify="number"  readonly="readonly">
+        </div>
+    </div>
+     </#if>
     </div>
 </form>
 <script type="text/javascript" src="${base}/static/layui/layui.js"></script>
