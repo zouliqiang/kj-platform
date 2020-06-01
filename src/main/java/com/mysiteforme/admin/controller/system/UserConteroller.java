@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.google.common.collect.Lists;
@@ -212,10 +213,11 @@ public class UserConteroller extends BaseController{
     
     @GetMapping("edit")
     public String edit(Long id,Model model){
-        User user = userService.selectById(id);
+        User user = userService.findUserById(id);
         List<Long> roleIdList = Lists.newArrayList();
         if(user != null) {
             Set<Role> roleSet = user.getRoleLists();
+            System.out.println(JSON.toJSONString(roleSet));
             if (roleSet != null && roleSet.size() > 0) {
                 for (Role r : roleSet) {
                     roleIdList.add(r.getId());
@@ -348,6 +350,7 @@ public class UserConteroller extends BaseController{
             user.setIcon(user.getIcon().substring((one+1),user.getIcon().length()));
         }
         user.setRoleLists(oldUser.getRoleLists());
+        user.setChildIds(oldUser.getChildIds());
         userService.updateUser(user);
         return RestResponse.success();
     }

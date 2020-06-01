@@ -1,6 +1,5 @@
 package com.mysiteforme.admin.controller;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -52,11 +51,11 @@ import com.mysiteforme.admin.util.poi.ExportExcelWrapper;
  */
 @Controller
 @RequestMapping("/admin/salesslip")
-public class SalesSlipController extends BaseController{
-    
+public class SalesSlipController extends BaseController {
+
     @Autowired
-    private  RedisTemplate<String, String> redisTemplate;
-    
+    private RedisTemplate<String, String> redisTemplate;
+
     /**
      * @Description 进入保单列表页 
      * @return String     
@@ -68,7 +67,7 @@ public class SalesSlipController extends BaseController{
     public String list() {
         return "/admin/salesslip/list";
     }
-    
+
     /**
      * @Description 查询保单列表 
      * @param page
@@ -83,7 +82,7 @@ public class SalesSlipController extends BaseController{
     @PostMapping("list")
     @ResponseBody
     public LayerData<SalesSlipVo> list(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request) {
-        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String, Object> map = WebUtils.getParametersStartingWith(request, "s_");
         LayerData<SalesSlipVo> layerData = new LayerData<>();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("pageStart", (page - 1) * limit);
@@ -95,11 +94,11 @@ public class SalesSlipController extends BaseController{
             }
             String certificateNo = (String) map.get("certificateNo");
             if (StringUtils.isNotBlank(certificateNo)) {
-                paramMap.put("certificate_no",certificateNo);
+                paramMap.put("certificate_no", certificateNo);
             }
             String tel = (String) map.get("tel");
             if (StringUtils.isNotBlank(tel)) {
-                paramMap.put("tel", tel );
+                paramMap.put("tel", tel);
             }
             String website = (String) map.get("website");
             if (StringUtils.isNotBlank(website)) {
@@ -108,27 +107,27 @@ public class SalesSlipController extends BaseController{
             String insuranceRange = (String) map.get("insurance_range");
             if (StringUtils.isNotBlank(insuranceRange)) {
                 String[] split = insuranceRange.split(" - ");
-                paramMap.put("insurance_start_date", split[0]+" 00:00:00");
-                paramMap.put("insurance_end_date", split[1]+" 23:59:59");
+                paramMap.put("insurance_start_date", split[0] + " 00:00:00");
+                paramMap.put("insurance_end_date", split[1] + " 23:59:59");
             }
         }
         User currentUser = getCurrentUser();
         String childIds = currentUser.getChildIds();
-        if(StringUtils.isNotBlank(childIds)) {
-            childIds=childIds+","+currentUser.getId();
-        }else {
-            childIds=currentUser.getId().toString();
+        if (StringUtils.isNotBlank(childIds)) {
+            childIds = childIds + "," + currentUser.getId();
+        } else {
+            childIds = currentUser.getId().toString();
         }
 
         if (!currentUser.getIsSuper()) {
             List<String> asList = Arrays.asList(StringUtils.split(childIds, ","));
-            List<Long> longList=new ArrayList<Long>();
-            for(String str:asList) {
+            List<Long> longList = new ArrayList<Long>();
+            for (String str : asList) {
                 longList.add(Long.valueOf(str));
             }
-            paramMap.put("create_by",longList);
-        }else {
-            paramMap.put("create_by",new ArrayList<Long>());
+            paramMap.put("create_by", longList);
+        } else {
+            paramMap.put("create_by", new ArrayList<Long>());
         }
         List<SalesSlipVo> list = salesSlipService.getListSalesSlip(paramMap);
         Integer total = salesSlipService.getTotal(paramMap);
@@ -136,7 +135,7 @@ public class SalesSlipController extends BaseController{
         layerData.setCount(total);
         return layerData;
     }
-    
+
     /**
      * @Description 进入录入保单页面 
      * @return    
@@ -149,7 +148,7 @@ public class SalesSlipController extends BaseController{
     public String add() {
         return "/admin/salesslip/add";
     }
-    
+
     /**
      * @Description 录入保单 
      * @param salesSlip
@@ -165,60 +164,60 @@ public class SalesSlipController extends BaseController{
     @ResponseBody
     public RestResponse add(@RequestBody SalesSlip salesSlip) {
         User currentUser = getCurrentUser();
-        if(currentUser.getIsSuper()) {
+        if (currentUser.getIsSuper()) {
             return RestResponse.failure("超级管理员没有添加保单权限");
         }
         lock("salesSlip");
         try {
-        PolicyNo policyNo = policyNoService.getActivePolicyNo();
-        if(policyNo==null) {
-            return RestResponse.failure("保单未激活，请联系管理员");
-        }
-        policyNo.setNoNumber(policyNo.getNoNumber()+1);
-        policyNo.setNewNo(policyNo.getNewNo()+1);
-        policyNo.setUpdateDate(new Date());
-        policyNo.setUpdateId(currentUser.getCreateId());
-        Date date = new Date();
-        salesSlip.setPolicyNo(policyNo.getPolicyNo());
-        salesSlip.setNo(policyNo.getNewNoStr());
-        salesSlip.setCreateId(currentUser.getId());
-        salesSlip.setCreateDate(date);
-        salesSlip.setDelFlag(0);
-        if(salesSlip.getServiceCharge()==null) {
-        	salesSlip.setServiceCharge(0);
-        }
-        salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
-        Map<String,Object> map=new HashMap<String,Object>();
-        map.put("userId", currentUser.getId());
-        map.put("policyNo", policyNo.getPolicyNo());
-        if ("1".equals(salesSlip.getCustomerType())) {
-            salesSlip.setCertificateType(1);
-        } else {
-            salesSlip.setCertificateType(2);
-        }
-        PolicyNoUser policyNoUser = policyNoUserService.getPolicyNoUser(map);
-        if(policyNoUser==null) {
-            return RestResponse.failure("您暂且无录入保单权限！请联系管理员");
-        }
-        Integer allocationNumber = policyNoUser.getAllocationNumber();
-        Integer useNumber = policyNoUser.getUseNumber();
-        if(useNumber>=allocationNumber) {
-            return RestResponse.failure("录入保单数量超限，不可再次录入");
-        }
-        policyNoUser.setUseNumber(policyNoUser.getUseNumber()+1);
-        salesSlipService.saveSalesSlip(salesSlip);
-        policyNoService.updateById(policyNo);
-        policyNoUserService.updateById(policyNoUser);
-        SalesSlipHistory salesSlipHistory = getSalesSlipHistory(salesSlip, 1);
-        salesSlipHistoryService.insert(salesSlipHistory);
-        }catch (Exception e) {
+            PolicyNo policyNo = policyNoService.getActivePolicyNo();
+            if (policyNo == null) {
+                return RestResponse.failure("保单未激活，请联系管理员");
+            }
+            policyNo.setNoNumber(policyNo.getNoNumber() + 1);
+            policyNo.setNewNo(policyNo.getNewNo() + 1);
+            policyNo.setUpdateDate(new Date());
+            policyNo.setUpdateId(currentUser.getCreateId());
+            Date date = new Date();
+            salesSlip.setPolicyNo(policyNo.getPolicyNo());
+            salesSlip.setNo(policyNo.getNewNoStr());
+            salesSlip.setCreateId(currentUser.getId());
+            salesSlip.setCreateDate(date);
+            salesSlip.setDelFlag(0);
+            if (salesSlip.getServiceCharge() == null) {
+                salesSlip.setServiceCharge(0);
+            }
+            salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("userId", currentUser.getId());
+            map.put("policyNo", policyNo.getPolicyNo());
+            if ("1".equals(salesSlip.getCustomerType())) {
+                salesSlip.setCertificateType(1);
+            } else {
+                salesSlip.setCertificateType(2);
+            }
+            PolicyNoUser policyNoUser = policyNoUserService.getPolicyNoUser(map);
+            if (policyNoUser == null) {
+                return RestResponse.failure("您暂且无录入保单权限！请联系管理员");
+            }
+            Integer allocationNumber = policyNoUser.getAllocationNumber();
+            Integer useNumber = policyNoUser.getUseNumber();
+            if (useNumber >= allocationNumber) {
+                return RestResponse.failure("录入保单数量超限，不可再次录入");
+            }
+            policyNoUser.setUseNumber(policyNoUser.getUseNumber() + 1);
+            salesSlipService.saveSalesSlip(salesSlip);
+            policyNoService.updateById(policyNo);
+            policyNoUserService.updateById(policyNoUser);
+            SalesSlipHistory salesSlipHistory = getSalesSlipHistory(salesSlip, 1);
+            salesSlipHistoryService.insert(salesSlipHistory);
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            unLock("salesSlip"); 
+        } finally {
+            unLock("salesSlip");
         }
         return RestResponse.success();
     }
-    
+
     /**
      * @Description 查看保单内容 
      * @param id
@@ -237,7 +236,14 @@ public class SalesSlipController extends BaseController{
             return "/admin/error/404";
         }
         SalesSlip salesSlip = salesSlipService.selectById(id);
-        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != salesSlip.getCreateId().intValue()) {
+        String childIds = currentUser.getChildIds();
+        if (StringUtils.isNotBlank(childIds)) {
+            childIds = childIds + "," + currentUser.getId();
+        }
+        String[] strArr= childIds.split(",");
+        List<String> list = Arrays.asList(strArr);
+        
+        if (id != null && !currentUser.getIsSuper() && !list.contains(currentUser.getId().toString())) {
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
@@ -248,7 +254,7 @@ public class SalesSlipController extends BaseController{
         model.addAttribute("salesSlip", salesSlip);
         return "/admin/salesslip/look";
     }
-    
+
     /**
      * @Description 进入编辑保单页面 
      * @param id
@@ -267,7 +273,13 @@ public class SalesSlipController extends BaseController{
             return "/admin/error/404";
         }
         SalesSlip salesSlip = salesSlipService.selectById(id);
-        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != salesSlip.getCreateId().intValue()) {
+        String childIds = currentUser.getChildIds();
+        if (StringUtils.isNotBlank(childIds)) {
+            childIds = childIds + "," + currentUser.getId();
+        }
+        String[] strArr= childIds.split(",");
+        List<String> list = Arrays.asList(strArr);
+        if (id != null && !currentUser.getIsSuper() &&!list.contains(currentUser.getId().toString())) {
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
@@ -275,10 +287,17 @@ public class SalesSlipController extends BaseController{
             model.addAttribute("message", "暂无保单信息");
             return "/admin/error/404";
         }
+        if (!currentUser.getIsSuper()) {
+            Integer editCount = salesSlip.getEditCount();
+            if(editCount>=3) {
+                model.addAttribute("message", "编辑次数不允许超过三次！");
+                return "/admin/error/404";
+            }
+        }
         model.addAttribute("salesSlip", salesSlip);
         return "/admin/salesslip/edit";
     }
-    
+
     @RequiresPermissions("salesslip:edit")
     @PostMapping("edit")
     @SysLog("编辑保单数据")
@@ -286,34 +305,40 @@ public class SalesSlipController extends BaseController{
     public RestResponse edit(@RequestBody SalesSlip salesSlip) {
         User currentUser = getCurrentUser();
         try {
-        SalesSlip editSalesSlip = salesSlipService.selectById(salesSlip.getId());
-        Date date = new Date();
-        salesSlip.setPolicyNo(editSalesSlip.getPolicyNo());
-        salesSlip.setNo(editSalesSlip.getNo());
-        salesSlip.setCreateDate(editSalesSlip.getCreateDate());
-        salesSlip.setCreateId(editSalesSlip.getCreateId());
-        salesSlip.setEditCount(editSalesSlip.getEditCount()+1);
-        salesSlip.setUpdateId(currentUser.getId());
-        salesSlip.setUpdateDate(date);
-        salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
-        if ("1".equals(salesSlip.getCustomerType())) {
-            salesSlip.setCertificateType(1);
-        } else {
-            salesSlip.setCertificateType(2);
-        }
-        salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
-        SalesSlipHistory salesSlipHistory = getSalesSlipHistory(salesSlip,2);
-        if(salesSlip.getServiceCharge()==null) {
-        	salesSlip.setServiceCharge(0);
-        }
-        salesSlipService.updateById(salesSlip);
-        salesSlipHistoryService.insert(salesSlipHistory);
-        }catch (Exception e) {
+            SalesSlip editSalesSlip = salesSlipService.selectById(salesSlip.getId());
+            if (!currentUser.getIsSuper()) {
+                Integer editCount = editSalesSlip.getEditCount();
+                if(editCount>=3) {
+                    return RestResponse.failure("编辑次数不允许超过三次！");
+                }
+            }
+            Date date = new Date();
+            salesSlip.setPolicyNo(editSalesSlip.getPolicyNo());
+            salesSlip.setNo(editSalesSlip.getNo());
+            salesSlip.setCreateDate(editSalesSlip.getCreateDate());
+            salesSlip.setCreateId(editSalesSlip.getCreateId());
+            salesSlip.setEditCount(editSalesSlip.getEditCount() + 1);
+            salesSlip.setUpdateId(currentUser.getId());
+            salesSlip.setUpdateDate(date);
+            salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
+            if ("1".equals(salesSlip.getCustomerType())) {
+                salesSlip.setCertificateType(1);
+            } else {
+                salesSlip.setCertificateType(2);
+            }
+            salesSlip.setInsuranceEndDate(DateUtil.getNextYear(salesSlip.getInsuranceStartDate(), salesSlip.getInsuranceTerm()));
+            SalesSlipHistory salesSlipHistory = getSalesSlipHistory(salesSlip, 2);
+            if (salesSlip.getServiceCharge() == null) {
+                salesSlip.setServiceCharge(0);
+            }
+            salesSlipService.updateById(salesSlip);
+            salesSlipHistoryService.insert(salesSlipHistory);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return RestResponse.success();
     }
-    
+
     /**
      * @Description 进入保单打印页面 
      * @param id
@@ -331,19 +356,25 @@ public class SalesSlipController extends BaseController{
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
+        String childIds = currentUser.getChildIds();
+        if (StringUtils.isNotBlank(childIds)) {
+            childIds = childIds + "," + currentUser.getId();
+        }
+        String[] strArr= childIds.split(",");
+        List<String> list = Arrays.asList(strArr);
         SalesSlip salesSlip = salesSlipService.selectById(id);
         if (salesSlip == null) {
             model.addAttribute("message", "暂无保单信息");
             return "/admin/error/404";
         }
-        if (id != null && !currentUser.getIsSuper() && currentUser.getId().intValue() != salesSlip.getCreateId().intValue()) {
+        if (id != null && !currentUser.getIsSuper() && !list.contains(currentUser.getId().toString())) {
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
         model.addAttribute("salesSlip", salesSlip);
         return "/admin/salesslip/print";
     }
-    
+
     /**
      * @Description 导出保单 
      * @param request
@@ -357,7 +388,7 @@ public class SalesSlipController extends BaseController{
     @GetMapping("export")
     @ResponseBody
     public Boolean export(ServletRequest request, HttpServletResponse response) {
-        Map<String,Object> map = WebUtils.getParametersStartingWith(request, "s_");
+        Map<String, Object> map = WebUtils.getParametersStartingWith(request, "s_");
         Map<String, Object> paramMap = new HashMap<String, Object>();
         if (!map.isEmpty()) {
             String customeType = (String) map.get("custometype");
@@ -375,27 +406,27 @@ public class SalesSlipController extends BaseController{
         }
         User currentUser = getCurrentUser();
         String childIds = currentUser.getChildIds();
-        if(StringUtils.isNotBlank(childIds)) {
-            childIds=childIds+","+currentUser.getId();
-        }else {
-            childIds=currentUser.getId().toString();
+        if (StringUtils.isNotBlank(childIds)) {
+            childIds = childIds + "," + currentUser.getId();
+        } else {
+            childIds = currentUser.getId().toString();
         }
 
         if (!currentUser.getIsSuper()) {
             List<String> asList = Arrays.asList(StringUtils.split(childIds, ","));
-            List<Long> longList=new ArrayList<Long>();
-            for(String str:asList) {
+            List<Long> longList = new ArrayList<Long>();
+            for (String str : asList) {
                 longList.add(Long.valueOf(str));
             }
-            paramMap.put("create_by",longList);
-        }else {
-            paramMap.put("create_by",new ArrayList<Long>());
+            paramMap.put("create_by", longList);
+        } else {
+            paramMap.put("create_by", new ArrayList<Long>());
         }
         List<SalesSlipVo> list = salesSlipService.getListSalesSlip(paramMap);
-        List<SalesSlipExport> result=new ArrayList<SalesSlipExport>();
-        Integer index=1;
+        List<SalesSlipExport> result = new ArrayList<SalesSlipExport>();
+        Integer index = 1;
         for (SalesSlipVo salesSlip : list) {
-            SalesSlipExport salesSlipExport=new SalesSlipExport();
+            SalesSlipExport salesSlipExport = new SalesSlipExport();
             salesSlipExport.setIndex(index++);
             salesSlipExport.setPolicyNo(salesSlip.getPolicyNo());
             salesSlipExport.setNo(salesSlip.getNo());
@@ -428,8 +459,8 @@ public class SalesSlipController extends BaseController{
             result.add(salesSlipExport);
         }
         try {
-            String[] columnNames = { "序号", "保单号", " NO","客户名字", "客户类型","证件号","客户联系电话","通讯地址","车品牌","车牌号","车架号","发动机号","登记日期",
-                    "初始车价格","安装日期","安装地点","安装人","产品SN码","保险期限","保险开始时间","保险结束时间","赔偿限额","第一受益人","录入时间","录入人"};
+            String[] columnNames = { "序号", "保单号", " NO", "客户名字", "客户类型", "证件号", "客户联系电话", "通讯地址", "车品牌", "车牌号", "车架号", "发动机号", "登记日期", "初始车价格", "安装日期", "安装地点", "安装人", "产品SN码", "保险期限", "保险开始时间",
+                    "保险结束时间", "赔偿限额", "第一受益人", "录入时间", "录入人" };
             String fileName = "保单表";
             ExportExcelWrapper<SalesSlipExport> util = new ExportExcelWrapper<SalesSlipExport>();
             util.exportExcel(fileName, fileName, columnNames, result, response, ExportExcelUtil.EXCEl_FILE_2007);
@@ -438,7 +469,7 @@ public class SalesSlipController extends BaseController{
         }
         return true;
     }
-    
+
     /**
      * @Description 导出汇总单 
      * @param request
@@ -458,13 +489,13 @@ public class SalesSlipController extends BaseController{
             paramMap.put("create_by", currentUser.getId());
         }
         List<SummarySalesSlip> list = salesSlipService.getSummarySalesSlip(paramMap);
-        Integer index=0;
+        Integer index = 0;
         for (SummarySalesSlip summarySalesSlip : list) {
             index++;
             summarySalesSlip.setIndex(index);
         }
         try {
-            String[] columnNames = { "序号", "4S店名称", " 录入人", "录入总单数"};
+            String[] columnNames = { "序号", "4S店名称", " 录入人", "录入总单数" };
             String fileName = "保单录入汇总表";
             ExportExcelWrapper<SummarySalesSlip> util = new ExportExcelWrapper<SummarySalesSlip>();
             util.exportExcel(fileName, fileName, columnNames, list, response, ExportExcelUtil.EXCEl_FILE_2007);
@@ -474,7 +505,6 @@ public class SalesSlipController extends BaseController{
         return true;
     }
 
-    
     /**
      * @Description redis分布式锁 
      * @param lockKey
@@ -483,22 +513,22 @@ public class SalesSlipController extends BaseController{
      * @auth    邹立强   (zoulq@cloud-young.com)
      * 2019年3月31日 上午11:23:09
      */
-    public synchronized boolean lock(String lockKey){
+    public synchronized boolean lock(String lockKey) {
         boolean locked = false;
-        Boolean success = redisTemplate.opsForValue().setIfAbsent(lockKey,"addSalesSliping");
-        if(success != null && success){
-            redisTemplate.expire(lockKey,10,TimeUnit.SECONDS);
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(lockKey, "addSalesSliping");
+        if (success != null && success) {
+            redisTemplate.expire(lockKey, 10, TimeUnit.SECONDS);
             locked = true;
-        }else{
+        } else {
             while (true) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                Boolean success2 = redisTemplate.opsForValue().setIfAbsent(lockKey,"addSalesSliping");
-                if(success2 != null && success2){
-                    redisTemplate.expire(lockKey,10,TimeUnit.SECONDS);
+                Boolean success2 = redisTemplate.opsForValue().setIfAbsent(lockKey, "addSalesSliping");
+                if (success2 != null && success2) {
+                    redisTemplate.expire(lockKey, 10, TimeUnit.SECONDS);
                     locked = true;
                     break;
                 }
@@ -506,7 +536,7 @@ public class SalesSlipController extends BaseController{
         }
         return locked;
     }
-    
+
     /**
      * @Description redis解锁 
      * @param lockKey    
@@ -515,10 +545,10 @@ public class SalesSlipController extends BaseController{
      * @auth    邹立强   (zoulq@cloud-young.com)
      * 2019年3月31日 上午11:24:26
      */
-    public  void unLock(String lockKey){
-       redisTemplate.delete(lockKey);
+    public void unLock(String lockKey) {
+        redisTemplate.delete(lockKey);
     }
-    
+
     /**
      * @Description 转换历史保单实体 
      * type 2修改1新增
@@ -528,8 +558,8 @@ public class SalesSlipController extends BaseController{
      * @auth    邹立强   (zoulq@cloud-young.com)
      * 2019年4月14日 上午11:38:26
      */
-    private SalesSlipHistory getSalesSlipHistory(SalesSlip salesSlip,Integer type) {
-        SalesSlipHistory salesSlipHistory=new SalesSlipHistory();
+    private SalesSlipHistory getSalesSlipHistory(SalesSlip salesSlip, Integer type) {
+        SalesSlipHistory salesSlipHistory = new SalesSlipHistory();
         BeanUtils.copyProperties(salesSlip, salesSlipHistory, "editCount");
         salesSlipHistory.setId(null);
         salesSlipHistory.setType(type);
