@@ -17,4 +17,6 @@ public interface SalesSlipDao extends BaseMapper<SalesSlip> {
 
     List<SummarySalesSlip> getSummarySalesSlip(Map<String, Object> paramMap);
 
+    List<Long> getIdsByUserIds(List<Long> lists);
+
 }

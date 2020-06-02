@@ -69,29 +69,29 @@ public class LoginController extends BaseController {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String rememberMe = request.getParameter("rememberMe");
-		String code = request.getParameter("code");
+		//String code = request.getParameter("code");
 		if(StringUtils.isBlank(username) || StringUtils.isBlank(password)){
 			return RestResponse.failure("用户名或者密码不能为空");
 		}
 		if(StringUtils.isBlank(rememberMe)){
 			return RestResponse.failure("记住我不能为空");
 		}
-		if(StringUtils.isBlank(code)){
+		/*if(StringUtils.isBlank(code)){
 			return  RestResponse.failure("验证码不能为空");
-		}
+		}*/
 		Map<String,Object> map = Maps.newHashMap();
 		String error = null;
 		HttpSession session = request.getSession();
 		if(session == null){
 			return RestResponse.failure("session超时");
 		}
-		String trueCode =  (String)session.getAttribute(Constants.VALIDATE_CODE);
-		if(StringUtils.isBlank(trueCode)){
-			return RestResponse.failure("验证码超时");
-		}
-		if(StringUtils.isBlank(code) || !trueCode.toLowerCase().equals(code.toLowerCase())){
-			error = "验证码错误";
-		}else {
+		//String trueCode =  (String)session.getAttribute(Constants.VALIDATE_CODE);
+		//if(StringUtils.isBlank(trueCode)){
+		//	return RestResponse.failure("验证码超时");
+		//}
+		//if(StringUtils.isBlank(code) || !trueCode.toLowerCase().equals(code.toLowerCase())){
+		//	error = "验证码错误";
+		//}else {
 			/*就是代表当前的用户。*/
 			Subject user = SecurityUtils.getSubject();
 			UsernamePasswordToken token = new UsernamePasswordToken(username,password,Boolean.valueOf(rememberMe));
@@ -115,7 +115,7 @@ public class LoginController extends BaseController {
 			} catch (UnauthorizedException e) {
 				error = "您没有得到相应的授权！";
 			}
-		}
+		//}
 		if(StringUtils.isBlank(error)){
 			return RestResponse.success("登录成功").setData(map);
 		}else{

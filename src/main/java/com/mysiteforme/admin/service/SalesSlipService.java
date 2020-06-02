@@ -25,4 +25,6 @@ public interface SalesSlipService extends IService<SalesSlip> {
 
     public List<SummarySalesSlip> getSummarySalesSlip(Map<String, Object> paramMap);
 
+    public List<Long> getIdsByUserIds(List<Long> lists);
+
 }

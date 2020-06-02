@@ -45,4 +45,9 @@ public class SalesSlipServiceImpl extends ServiceImpl<SalesSlipDao, SalesSlip> i
     public List<SummarySalesSlip> getSummarySalesSlip(Map<String, Object> paramMap) {
         return salesSlipDao.getSummarySalesSlip(paramMap);
     }
+
+    @Override
+    public List<Long> getIdsByUserIds(List<Long> lists) {
+        return salesSlipDao.getIdsByUserIds(lists);
+    }
 }

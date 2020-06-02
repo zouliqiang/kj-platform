@@ -11,13 +11,16 @@
 		ss.customer_type as customerType,
 		ss.customer_name as customerName,
 		ss.certificate_type as certificateType,
-		ss.certificate_no as certificateNo,
+		ss.certificate_no as
+		certificateNo,
 		ss.customer_mobile as customerMobile,
 		ss.customer_address as customerAddress,
-		ss.vehicle_brand as vehicleBrand,
+		ss.vehicle_brand as
+		vehicleBrand,
 		ss.licence_plate_no as licencePlateNo,
 		ss.vehicle_frame_no as vehicleFrameNo,
-		ss.engine_frame_no as engineFrameNo,
+		ss.engine_frame_no as
+		engineFrameNo,
 		ss.registration_date as registrationDate,
 		ss.vehicle_price as vehiclePrice,
 		ss.install_date as installDate,
@@ -26,27 +29,32 @@
 		ss.product_no as productNo,
 		ss.insurance_term as insuranceTerm,
 		ss.insurance_start_date as insuranceStartDate,
-		ss.insurance_end_date as insuranceEndDate,
+		ss.insurance_end_date as
+		insuranceEndDate,
 		ss.compensate_price as compensatePrice,
-		ss.edit_count as editCount,
+		ss.edit_count
+		as editCount,
 		ss.first_beneficiary as firstBeneficiary,
-		ss.create_date as createDate,
+		ss.create_date
+		as createDate,
 		ss.create_by as createBy,
 		ss.update_date as updateDate,
 		ss.update_by as updateBy,
 		ss.del_flag as delFlag,
 		su.login_name as name,
 		su.website as website
-		from sales_slip ss left join sys_user su on ss.create_by=su.id
+		from sales_slip ss left join sys_user su on
+		ss.create_by=su.id
 		where
 		ss.del_flag = false and su.del_flag=false
-	   <if test="create_by != null and create_by.size > 0 ">
-	    and ss.create_by in 
-			<foreach collection="create_by" index="index" item="id" open="(" separator="," close=")">
-		           #{id}
-            </foreach>
-        </if>    
-	    <if test="customer_name!= null and customer_name!='' ">
+		<if test="create_by != null and create_by.size > 0 ">
+			and ss.create_by in
+			<foreach collection="create_by" index="index" item="id" open="("
+				separator="," close=")">
+				#{id}
+			</foreach>
+		</if>
+		<if test="customer_name!= null and customer_name!='' ">
 			and ss.customer_name like #{customer_name}
 		</if>
 		<if test="certificate_no!= null and certificate_no!='' ">
@@ -72,15 +80,17 @@
 	<select id="getTotal" parameterType="java.util.Map" resultType="java.lang.Integer">
 		select
 		count(1)
-		from sales_slip ss left join sys_user su on ss.create_by=su.id
+		from sales_slip ss left join sys_user su on
+		ss.create_by=su.id
 		where
 		ss.del_flag = false and su.del_flag=false
 		<if test="create_by != null and create_by.size > 0 ">
-	     and ss.create_by in 
-			<foreach collection="create_by" index="index" item="id" open="(" separator="," close=")">
-		           #{id}
-            </foreach>
-        </if>
+			and ss.create_by in
+			<foreach collection="create_by" index="index" item="id" open="("
+				separator="," close=")">
+				#{id}
+			</foreach>
+		</if>
 		<if test="customer_type!= null and customer_type!='' ">
 			and ss.customer_type = #{customer_type}
 		</if>
@@ -91,18 +101,29 @@
 			and ss.customer_name like #{customer_name}
 		</if>
 	</select>
-     
-    <select id="getSummarySalesSlip" parameterType="java.util.Map" resultType="com.mysiteforme.admin.entity.VO.SummarySalesSlip">
-     select
+
+	<select id="getSummarySalesSlip" parameterType="java.util.Map"
+		resultType="com.mysiteforme.admin.entity.VO.SummarySalesSlip">
+		select
 		su.website as authorizedOutlets,
 		su.login_name as name,
-		count(1) as num
+		count(1)
+		as num
 		from sales_slip ss left join sys_user su on ss.create_by=su.id
 		where
-		ss.del_flag = false and su.del_flag=false 
+		ss.del_flag = false and su.del_flag=false
 		<if test="create_by!= null and create_by!='' ">
 			and ss.create_by = #{create_by}
 		</if>
 		GROUP BY ss.create_by
-    </select>
+	</select>
+	<select id="getIdsByUserIds" parameterType="java.util.List" resultType="java.lang.Long">
+		select id from sales_slip where create_by in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			(#{item})
+	    </foreach>
+	</select>
+
+
 </mapper>

@@ -240,10 +240,14 @@ public class SalesSlipController extends BaseController {
         if (StringUtils.isNotBlank(childIds)) {
             childIds = childIds + "," + currentUser.getId();
         }
+        List<Long> list=new ArrayList<Long>();
         String[] strArr= childIds.split(",");
-        List<String> list = Arrays.asList(strArr);
+        for (String str : strArr) {
+            list.add(Long.valueOf(str));
+        }
+        List<Long> lists=salesSlipService.getIdsByUserIds(list);
         
-        if (id != null && !currentUser.getIsSuper() && !list.contains(currentUser.getId().toString())) {
+        if (id != null && !currentUser.getIsSuper() && !lists.contains(id)) {
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
@@ -278,8 +282,12 @@ public class SalesSlipController extends BaseController {
             childIds = childIds + "," + currentUser.getId();
         }
         String[] strArr= childIds.split(",");
-        List<String> list = Arrays.asList(strArr);
-        if (id != null && !currentUser.getIsSuper() &&!list.contains(currentUser.getId().toString())) {
+        List<Long> list=new ArrayList<Long>();
+        for (String str : strArr) {
+            list.add(Long.valueOf(str));
+        }
+        List<Long> lists=salesSlipService.getIdsByUserIds(list);
+        if (id != null && !currentUser.getIsSuper() &&!lists.contains(id)) {
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
@@ -361,13 +369,17 @@ public class SalesSlipController extends BaseController {
             childIds = childIds + "," + currentUser.getId();
         }
         String[] strArr= childIds.split(",");
-        List<String> list = Arrays.asList(strArr);
+        List<Long> list=new ArrayList<Long>();
+        for (String str : strArr) {
+            list.add(Long.valueOf(str));
+        }
+        List<Long> lists=salesSlipService.getIdsByUserIds(list);
         SalesSlip salesSlip = salesSlipService.selectById(id);
         if (salesSlip == null) {
             model.addAttribute("message", "暂无保单信息");
             return "/admin/error/404";
         }
-        if (id != null && !currentUser.getIsSuper() && !list.contains(currentUser.getId().toString())) {
+        if (id != null && !currentUser.getIsSuper() &&!lists.contains(id)) {
             model.addAttribute("message", "暂无权限");
             return "/admin/error/404";
         }
