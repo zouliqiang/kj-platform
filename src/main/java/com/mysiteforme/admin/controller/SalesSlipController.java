@@ -239,6 +239,8 @@ public class SalesSlipController extends BaseController {
         String childIds = currentUser.getChildIds();
         if (StringUtils.isNotBlank(childIds)) {
             childIds = childIds + "," + currentUser.getId();
+        }else {
+            childIds=currentUser.getId().toString();
         }
         List<Long> list=new ArrayList<Long>();
         String[] strArr= childIds.split(",");
@@ -280,6 +282,8 @@ public class SalesSlipController extends BaseController {
         String childIds = currentUser.getChildIds();
         if (StringUtils.isNotBlank(childIds)) {
             childIds = childIds + "," + currentUser.getId();
+        }else {
+            childIds=currentUser.getId().toString();
         }
         String[] strArr= childIds.split(",");
         List<Long> list=new ArrayList<Long>();
@@ -367,6 +371,8 @@ public class SalesSlipController extends BaseController {
         String childIds = currentUser.getChildIds();
         if (StringUtils.isNotBlank(childIds)) {
             childIds = childIds + "," + currentUser.getId();
+        }else {
+            childIds=currentUser.getId().toString();
         }
         String[] strArr= childIds.split(",");
         List<Long> list=new ArrayList<Long>();
